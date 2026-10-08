@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+jobs:
+  install-typecheck-lint-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+      - run: npm audit --omit=dev --audit-level=high
+
+  # Phase 1 adds: backend-test (vitest+supertest, services: postgres/redis/mailpit).
+  # Phase 10 adds: e2e (playwright + artifact) and openapi-completeness jobs.

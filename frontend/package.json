@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
     "build": "next build",
     "start": "next start",
     "test:e2e": "playwright test"
