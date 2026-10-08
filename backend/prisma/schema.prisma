@@ -1,0 +1,453 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum WorkspaceRole {
+  ADMIN
+  PROJECT_MANAGER
+  TEAM_MEMBER
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum ProjectStatus {
+  PLANNING
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  CANCELLED
+}
+
+enum InformationRequestStatus {
+  DRAFT
+  SENT
+  ANSWERED
+  CLOSED
+}
+
+enum SubmissionStatus {
+  PROCESSING
+  EXTRACTED
+  AI_FAILED
+}
+
+enum RequirementPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum RequirementStatus {
+  DRAFT
+  ACCEPTED
+  REJECTED
+}
+
+enum RequirementSource {
+  AI
+  MANUAL
+}
+
+enum ScopeStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+}
+
+enum ScopeSource {
+  AI
+  MANUAL
+}
+
+enum ScopeVersionStatus {
+  DRAFT
+  APPROVED
+  SUPERSEDED
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  COMPLETED
+}
+
+enum ChangeRequestStatus {
+  PENDING_ANALYSIS
+  ANALYZED
+  NEEDS_MANUAL_REVIEW
+  ACCEPTED
+  REJECTED
+}
+
+enum AiClassification {
+  IN_SCOPE
+  OUT_OF_SCOPE
+  POSSIBLY_RELATED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedWorkspaces      Workspace[]       @relation("WorkspaceOwner")
+  workspaceMemberships WorkspaceMember[]
+  createdRequests      InformationRequest[] @relation("RequestCreator")
+  createdScopes        ScopeVersion[]    @relation("ScopeCreator")
+  requestedApprovals   Approval[]        @relation("ApprovalRequester")
+  assignedTasks        Task[]            @relation("TaskAssignee")
+  createdTasks         Task[]            @relation("TaskCreator")
+  sentMessages         Message[]
+  notifications        Notification[]
+  activityLogs         ActivityLog[]     @relation("LogActor")
+  passwordResetTokens  PasswordResetToken[]
+
+  @@index([email])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Workspace {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  ownerId     String
+  owner       User     @relation("WorkspaceOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members  WorkspaceMember[]
+  clients  Client[]
+  projects Project[]
+  activityLogs ActivityLog[]
+
+  @@index([ownerId])
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role        WorkspaceRole @default(TEAM_MEMBER)
+  joinedAt    DateTime      @default(now())
+
+  @@unique([workspaceId, userId])
+  @@index([workspaceId])
+  @@index([userId])
+}
+
+model Client {
+  id          String       @id @default(cuid())
+  workspaceId String
+  workspace   Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  name        String
+  email       String
+  company     String?
+  phone       String?
+  status      ClientStatus @default(ACTIVE)
+  // portal access: optional linked user account (client logs in with this)
+  portalUserId String?     @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  projects       Project[]
+  submissions    Submission[]
+  approvals      Approval[]
+  changeRequests ChangeRequest[]
+
+  @@index([workspaceId])
+  @@index([workspaceId, email])
+}
+
+model Project {
+  id          String        @id @default(cuid())
+  workspaceId String
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  name        String
+  description String?
+  startDate   DateTime?
+  deadline    DateTime?
+  status      ProjectStatus @default(PLANNING)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  informationRequests InformationRequest[]
+  submissions         Submission[]
+  requirements        Requirement[]
+  scopes              Scope[]
+  tasks               Task[]
+  changeRequests      ChangeRequest[]
+  messages            Message[]
+  activityLogs        ActivityLog[]
+
+  @@index([workspaceId])
+  @@index([clientId])
+  @@index([workspaceId, status])
+}
+
+model InformationRequest {
+  id          String                   @id @default(cuid())
+  projectId   String
+  project     Project                  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdById String
+  createdBy   User                     @relation("RequestCreator", fields: [createdById], references: [id])
+  title       String
+  description String?
+  questions   Json                     @default("[]")
+  deadline    DateTime?
+  status      InformationRequestStatus @default(DRAFT)
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+
+  submissions Submission[]
+
+  @@index([projectId])
+  @@index([projectId, status])
+}
+
+model Submission {
+  id                   String           @id @default(cuid())
+  projectId            String
+  project              Project          @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId             String
+  client               Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  informationRequestId String?
+  informationRequest   InformationRequest? @relation(fields: [informationRequestId], references: [id], onDelete: SetNull)
+  answers              Json             @default("{}")
+  fileUrl              String?
+  filePublicId         String?
+  status               SubmissionStatus @default(PROCESSING)
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+
+  requirements Requirement[]
+
+  @@index([projectId])
+  @@index([clientId])
+  @@index([informationRequestId])
+}
+
+model Requirement {
+  id                 String              @id @default(cuid())
+  projectId          String
+  project            Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  submissionId       String?
+  submission         Submission?         @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+  title              String
+  description        String?
+  category           String              @default("general")
+  priority           RequirementPriority @default(MEDIUM)
+  status             RequirementStatus   @default(DRAFT)
+  source             RequirementSource   @default(MANUAL)
+  acceptanceCriteria Json                @default("[]")
+  // AI-03 flags: { readinessScore?, missingInfo?: string[], ambiguous?: boolean, contradiction?: string|null }
+  aiFlags            Json?
+  confidence         Float?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+
+  tasks Task[]
+
+  @@index([projectId])
+  @@index([projectId, status])
+  @@index([submissionId])
+}
+
+model Scope {
+  id               String      @id @default(cuid())
+  projectId        String
+  project          Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  status           ScopeStatus @default(DRAFT)
+  source           ScopeSource @default(MANUAL)
+  features         Json        @default("[]")
+  deliverables     Json        @default("[]")
+  exclusions       Json        @default("[]")
+  deadline         DateTime?
+  approvedVersionId String?    @unique
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  versions  ScopeVersion[] @relation("ScopeVersions")
+  approvals Approval[]
+
+  @@index([projectId])
+}
+
+model ScopeVersion {
+  id          String             @id @default(cuid())
+  scopeId     String
+  scope       Scope              @relation("ScopeVersions", fields: [scopeId], references: [id], onDelete: Cascade)
+  version     Int
+  snapshot    Json
+  createdById String
+  createdBy   User               @relation("ScopeCreator", fields: [createdById], references: [id])
+  createdAt   DateTime           @default(now())
+  status      ScopeVersionStatus @default(DRAFT)
+
+  approvals      Approval[]
+  tasks          Task[]
+  changeRequests ChangeRequest[]
+
+  @@unique([scopeId, version])
+  @@index([scopeId])
+}
+
+model Approval {
+  id             String         @id @default(cuid())
+  scopeId        String
+  scope          Scope          @relation(fields: [scopeId], references: [id], onDelete: Cascade)
+  scopeVersionId String
+  scopeVersion   ScopeVersion   @relation(fields: [scopeVersionId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client         @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  requestedById  String
+  requestedBy    User           @relation("ApprovalRequester", fields: [requestedById], references: [id])
+  status         ApprovalStatus @default(PENDING)
+  decidedAt      DateTime?
+  comment        String?
+  createdAt      DateTime       @default(now())
+
+  @@index([scopeId])
+  @@index([scopeVersionId])
+  @@index([clientId])
+  @@index([status])
+}
+
+model Task {
+  id             String       @id @default(cuid())
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scopeVersionId String?
+  scopeVersion   ScopeVersion? @relation(fields: [scopeVersionId], references: [id], onDelete: SetNull)
+  requirementId  String?
+  requirement    Requirement? @relation(fields: [requirementId], references: [id], onDelete: SetNull)
+  assigneeId     String?
+  assignee       User?        @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  createdById    String
+  createdBy      User         @relation("TaskCreator", fields: [createdById], references: [id])
+  title          String
+  description    String?
+  priority       TaskPriority @default(MEDIUM)
+  status         TaskStatus   @default(TODO)
+  deadline       DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([projectId, status])
+  @@index([scopeVersionId])
+}
+
+model ChangeRequest {
+  id             String              @id @default(cuid())
+  projectId      String
+  project        Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  scopeVersionId String?
+  scopeVersion   ScopeVersion?       @relation(fields: [scopeVersionId], references: [id], onDelete: SetNull)
+  title          String
+  description    String
+  fileUrl        String?
+  status         ChangeRequestStatus @default(PENDING_ANALYSIS)
+  aiClassification AiClassification?
+  aiImpact       Json?
+  aiRationale    String?
+  decidedAt      DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([projectId])
+  @@index([projectId, status])
+  @@index([clientId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content   String
+  createdAt DateTime @default(now())
+
+  @@index([projectId])
+  @@index([projectId, createdAt])
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       String
+  title      String
+  body       String?
+  read       Boolean  @default(false)
+  entityId   String?
+  entityType String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, read])
+}
+
+model ActivityLog {
+  id          String   @id @default(cuid())
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  projectId   String?
+  project     Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  actorId     String
+  actor       User     @relation("LogActor", fields: [actorId], references: [id], onDelete: Cascade)
+  action      String
+  entityType  String
+  entityId    String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  @@index([workspaceId])
+  @@index([projectId])
+  @@index([workspaceId, createdAt])
+}
