@@ -1,23 +1,60 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
-import { Nav, Page, Card } from '@/components/ui/primitives';
+"use client";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { api, ApiError } from "@/lib/api";
+import { AgencyShell } from "@/components/shells/agency-shell";
+import { AgencyGuard } from "@/components/shells/guards";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/layout";
+import { ListSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 
-export default function Notifications() {
-  const [items, setItems] = useState<any[]>([]);
-  const load = () => api.get('/api/notifications').then((j: any) => setItems(j.data ?? [])).catch(() => {});
-  useEffect(() => { load(); }, []);
+export default function NotificationsPage() {
+  const qc = useQueryClient();
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["notifications", "page"],
+    queryFn: () => api.get<any[]>("/api/notifications?limit=50").then((r) => ({ items: r.data, unread: r.meta?.unreadCount ?? 0 })),
+  });
+  const read = useMutation({
+    mutationFn: (id: string) => api.patch(`/api/notifications/${id}/read`, {}),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["notifications"] });
+    },
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed"),
+  });
+  const readAll = useMutation({
+    mutationFn: () => api.patch("/api/notifications/read-all", {}),
+    onSuccess: () => {
+      toast.success("All marked read");
+      void qc.invalidateQueries({ queryKey: ["notifications"] });
+    },
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Failed"),
+  });
+
   return (
-    <>
-      <Nav />
-      <Page title="Notifications">
-        <div className="grid gap-2">{items.map((n) => (
-          <Card key={n.id}><p className="font-medium">{n.title} {!n.read && <span className="text-xs text-blue-600">●</span>}</p>
-            <p className="text-xs">{n.body}</p>
-            {!n.read && <button className="text-xs underline" onClick={async () => { await api.patch(`/api/notifications/${n.id}/read`, {}); load(); }}>Mark read</button>}
-          </Card>
-        ))}</div>
-      </Page>
-    </>
+    <AgencyGuard>
+      <AgencyShell>
+        <PageHeader title="Notifications" hint={data ? `${data.unread} unread` : undefined} actions={<Button variant="outline" size="sm" onClick={() => readAll.mutate()}>Mark all read</Button>} />
+        {isLoading && <ListSkeleton />}
+        {error && <ErrorState message="Could not load notifications." onRetry={() => refetch()} />}
+        {data && data.items.length === 0 && <EmptyState title="All caught up" />}
+        <div className="grid gap-2">
+          {data?.items.map((n: any) => (
+            <Card key={n.id} className={n.read ? "opacity-70" : ""}>
+              <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                <div className="flex-1">
+                  <p className="font-medium">{n.title}</p>
+                  {n.body && <p className="text-sm text-zinc-600">{n.body}</p>}
+                  <p className="text-xs text-zinc-500">{format(new Date(n.createdAt), "MMM d, yyyy HH:mm")}</p>
+                </div>
+                {n.link && <a href={n.link} className="text-sm underline">Open</a>}
+                {!n.read && <Button size="sm" variant="outline" onClick={() => read.mutate(n.id)}>Mark read</Button>}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </AgencyShell>
+    </AgencyGuard>
   );
 }
