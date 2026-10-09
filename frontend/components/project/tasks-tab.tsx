@@ -25,6 +25,14 @@ export function TasksTab({ projectId }: { projectId: string }) {
     queryKey: ["tasks", projectId, status],
     queryFn: () => api.get<any[]>(`/api/tasks?projectId=${projectId}&limit=100${status ? `&status=${status}` : ""}`).then((r) => r.data),
   });
+  const members = useQuery({
+    queryKey: ["assignable-members", projectId],
+    queryFn: async () => {
+      const p = await api.get<any>(`/api/projects/${projectId}`).then((r) => r.data);
+      if (!p?.workspaceId) return [];
+      return api.get<any[]>(`/api/users?workspaceId=${p.workspaceId}&limit=100`).then((r) => r.data);
+    },
+  });
   const versions = useQuery({
     queryKey: ["scope-versions", projectId, "approved"],
     queryFn: async () => {
@@ -40,6 +48,15 @@ export function TasksTab({ projectId }: { projectId: string }) {
     void qc.invalidateQueries({ queryKey: ["tasks", projectId] });
     void qc.invalidateQueries({ queryKey: ["traceability", projectId] });
   };
+  const assign = useMutation({
+    mutationFn: ({ id, assigneeId }: { id: string; assigneeId: string | null }) =>
+      api.patch(`/api/tasks/${id}`, { assigneeId }),
+    onSuccess: () => {
+      toast.success("Task assigned");
+      inv();
+    },
+    onError: (e) => toast.error(e instanceof ApiError ? e.message : "Assign failed"),
+  });
   const move = useMutation({
     mutationFn: ({ id, to }: { id: string; to: string }) => api.patch(`/api/tasks/${id}`, { status: to }),
     onSuccess: () => {
@@ -107,6 +124,10 @@ export function TasksTab({ projectId }: { projectId: string }) {
                   <p className="font-medium"><span className="font-mono text-xs text-zinc-500">{t.code}</span> {t.title}</p>
                   <p className="text-xs text-zinc-500">{t.requirement ? `${t.requirement.code} · ` : ""}{t.assignee?.name ?? "unassigned"} · {t.priority}</p>
                 </div>
+                <Select aria-label="Assign task" value={t.assignee?.id ?? ""} onChange={(e) => assign.mutate({ id: t.id, assigneeId: e.target.value || null })}>
+                  <option value="">Unassigned</option>
+                  {(members.data ?? []).map((m: any) => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </Select>
                 <Select aria-label="Move task" value={t.status} onChange={(e) => move.mutate({ id: t.id, to: e.target.value })}>
                   {COLS.map((c) => <option key={c} value={c}>{c}</option>)}
                 </Select>

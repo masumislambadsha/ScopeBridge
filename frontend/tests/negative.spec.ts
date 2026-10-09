@@ -31,7 +31,8 @@ test('client cannot see internal data or agency routes', async ({ browser }: { b
   await pm.getByLabel('Client').selectOption('Neg Co');
   await pm.getByLabel('Name').fill('Neg Project');
   await pm.getByRole('button', { name: 'Create project' }).click();
-  await expect(pm).toHaveURL(/\/projects\/.+/);
+  // Wait for the detail page itself (not just /projects/* — "new" would match too).
+  await expect(pm.getByRole('tab', { name: 'Messages', exact: true })).toBeVisible({ timeout: 30000 });
   const projectId = pm.url().split('/projects/')[1].split(/[?#]/)[0];
   await pm.getByRole('tab', { name: 'Messages', exact: true }).click();
   await pm.getByLabel('Message').fill('Secret internal note');

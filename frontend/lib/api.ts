@@ -13,10 +13,33 @@ export class ApiError extends Error {
 }
 
 let accessToken: string | null = null;
+const MEM_KEY = "sb_at";
+
+function readStored(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(MEM_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Access token lives in memory, mirrored to tab-scoped sessionStorage so full
+ * page reloads don't force a refresh roundtrip (D-17). Cleared on logout and
+ * on final 401. Never localStorage. */
 export function setAccessToken(t: string | null) {
   accessToken = t;
+  if (typeof window !== "undefined") {
+    try {
+      if (t) window.sessionStorage.setItem(MEM_KEY, t);
+      else window.sessionStorage.removeItem(MEM_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
 }
 export function getAccessToken() {
+  if (!accessToken) accessToken = readStored();
   return accessToken;
 }
 
@@ -44,8 +67,15 @@ async function req<T>(path: string, opts: RequestInit = {}, retried = false): Pr
     const next = await sharedRefresh();
     if (next) {
       accessToken = next;
+      try {
+        if (typeof window !== "undefined") window.sessionStorage.setItem(MEM_KEY, next);
+      } catch {
+        /* ignore */
+      }
       return req(path, opts, true);
     }
+    // Refresh failed: drop the dead token so we don't keep retrying with it.
+    setAccessToken(null);
   }
   const json = await res.json().catch(() => null);
   if (!res.ok || !json?.success) {

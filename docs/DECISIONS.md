@@ -76,3 +76,8 @@ Consequence: deterministic ids, no silent queue failures.
 Context: fixtures must reference real entities for processor tests and smoke runs.
 Decision: mock extracts `[A-Z]+-\d+` codes from input for readiness/acceptance fixtures; extraction stays a fixed valid fixture.
 Consequence: deterministic, code-linked fixtures exercising every path.
+
+## D-17 — Access token mirrored in sessionStorage
+Context: the token lives in module memory, so every full-page navigation wiped it and forced a refresh roundtrip; concurrent post-reload 401s raced the single-use refresh token and flaked E2E/client reads.
+Decision: mirror the access token in tab-scoped sessionStorage (survives reloads, dies with the tab); cleared on logout and on final 401. Never localStorage.
+Consequence: reloads reuse the live token with zero roundtrips; refresh is now a rare path (expiry/multi-tab), still single-flight.
