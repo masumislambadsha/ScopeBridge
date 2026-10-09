@@ -7,11 +7,11 @@ import { requireProjectAccess } from "../../middleware/access";
 import * as C from "./portal.controller";
 
 const r = Router();
-r.use(requireAuth);
 
-r.get("/portal/projects", ah(C.projects));
+r.get("/portal/projects", requireAuth, ah(C.projects));
 r.get(
   "/portal/projects/:id",
+  requireAuth,
   validate(z.object({ id: z.string().min(1) }), "params"),
   requireProjectAccess("project.read", (req) => req.params.id),
   ah(C.project),

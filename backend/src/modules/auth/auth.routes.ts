@@ -8,6 +8,8 @@ import { registerSchema, loginSchema, forgotSchema, resetSchema } from "./auth.s
 
 const r = Router();
 
+// Public routes (no requireAuth): register, login, refresh, forgot/reset.
+// Authenticated: logout (revokes), me.
 r.post("/register", authLimiter, validate(registerSchema), ah(C.register));
 r.post("/login", authLimiter, validate(loginSchema), ah(C.login));
 r.post("/logout", ah(C.logout));

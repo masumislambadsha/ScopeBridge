@@ -29,7 +29,7 @@ describe("reminders", () => {
     await processReminders({} as never); // second run must not double-send
     const ir = await prisma.informationRequest.findUnique({ where: { id: irId } });
     expect(ir!.reminderCount).toBe(1);
-    const notes = await prisma.notification.findMany({ where: { entityId: irId, type: "IR_SENT" } });
+    const notes = await prisma.notification.findMany({ where: { entityId: irId, title: { startsWith: "Reminder:" } } });
     expect(notes.length).toBe(1);
     const audits = await prisma.activityLog.findMany({ where: { entityId: irId, action: "reminder.sent" } });
     expect(audits.length).toBe(1);
