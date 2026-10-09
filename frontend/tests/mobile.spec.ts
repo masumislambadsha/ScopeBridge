@@ -5,8 +5,8 @@ import { test, expect } from '@playwright/test';
 test.use({ viewport: { width: 412, height: 915 } });
 
 for (const [path, heading] of [
-  ['/', 'ScopeBridge'],
-  ['/login', 'ScopeBridge'],
+  ['/', 'Kill scope creep'],
+  ['/login', 'Welcome back'],
   ['/register', 'Create your account'],
   ['/forgot-password', 'Forgot password'],
   ['/portal/login', 'Client Portal'],
