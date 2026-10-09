@@ -85,7 +85,7 @@ export default function PortalScopePage({ params }: { params: { id: string } }) 
                       {(current.features ?? []).map((f: any) => (
                         <li key={f.id} className="rounded border p-2 text-sm">
                           <p className="font-medium">{f.title}</p>
-                          <p className="text-zinc-600">{f.description}</p>
+                          <p className="text-warm-600">{f.description}</p>
                         </li>
                       ))}
                     </ul>

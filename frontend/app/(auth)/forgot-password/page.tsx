@@ -6,8 +6,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input, Label, FieldError } from "@/components/ui/input";
+import { AuthShell } from "@/components/auth-shell";
 
 const schema = z.object({ email: z.string().email("Enter a valid email") });
 
@@ -21,27 +21,25 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Forgot password</CardTitle>
-          <CardDescription>We email you a reset link if the account exists.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {done ? (
-            <p className="text-sm">If an account exists for that email, a reset link is on its way. <Link href="/login" className="underline">Back to login</Link></p>
-          ) : (
-            <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" {...form.register("email")} />
-                <FieldError message={form.formState.errors.email?.message} />
-              </div>
-              <Button type="submit" disabled={form.formState.isSubmitting}>Send reset link</Button>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-    </main>
+    <AuthShell
+      title="Forgot password"
+      description="We email you a reset link if the account exists."
+      footer={
+        <Link href="/login" className="font-medium text-sage-600 underline underline-offset-4 hover:text-sage-700">Back to login</Link>
+      }
+    >
+      {done ? (
+        <p className="text-[15px] leading-relaxed text-warm-700">If an account exists for that email, a reset link is on its way.</p>
+      ) : (
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input id="email" type="email" {...form.register("email")} />
+            <FieldError message={form.formState.errors.email?.message} />
+          </div>
+          <Button type="submit" size="pill" disabled={form.formState.isSubmitting}>Send reset link</Button>
+        </form>
+      )}
+    </AuthShell>
   );
 }

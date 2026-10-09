@@ -26,9 +26,9 @@ export default function PortalRequirementsPage({ params }: { params: { id: strin
             <Card key={r.id}>
               <CardContent>
                 <p className="font-medium">{r.title}</p>
-                <p className="text-sm text-zinc-600">{r.description}</p>
+                <p className="text-sm text-warm-600">{r.description}</p>
                 {(r.acceptanceCriteria ?? []).length > 0 && (
-                  <ul className="mt-1 list-disc pl-5 text-xs text-zinc-600">
+                  <ul className="mt-1 list-disc pl-5 text-xs text-warm-600">
                     {r.acceptanceCriteria.map((c: any, i: number) => <li key={i}>Given {c.given}, when {c.when}, then {c.then}</li>)}
                   </ul>
                 )}

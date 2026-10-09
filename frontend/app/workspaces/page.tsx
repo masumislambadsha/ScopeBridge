@@ -56,8 +56,8 @@ export default function WorkspacesPage() {
             {data?.items.map((w: any) => (
               <Card key={w.id}>
                 <CardContent className="flex items-center justify-between gap-2">
-                  <div><p className="font-medium">{w.name}</p><p className="text-xs text-zinc-500">{w.role}</p></div>
-                  <a href={`/workspaces/${w.id}/members`} className="rounded-md border px-3 py-1.5 text-sm hover:bg-zinc-50">Members</a>
+                  <div><p className="font-medium">{w.name}</p><p className="text-xs text-warm-500">{w.role}</p></div>
+                  <a href={`/workspaces/${w.id}/members`} className="rounded-xl border px-3 py-1.5 text-sm hover:bg-sage-50/40">Members</a>
                 </CardContent>
               </Card>
             ))}

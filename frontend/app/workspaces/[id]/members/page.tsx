@@ -97,7 +97,7 @@ export default function MembersPage({ params }: { params: { id: string } }) {
               <Card key={m.id}>
                 <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <div className="flex-1">
-                    <p className="font-medium">{m.user?.name} <span className="text-xs text-zinc-500">{m.user?.email}</span></p>
+                    <p className="font-medium">{m.user?.name} <span className="text-xs text-warm-500">{m.user?.email}</span></p>
                     <StatusBadge status={m.role} />
                   </div>
                   <div className="flex gap-2">
@@ -116,7 +116,7 @@ export default function MembersPage({ params }: { params: { id: string } }) {
         <Card className="mt-4">
           <CardHeader><CardTitle>Pending invitations</CardTitle></CardHeader>
           <CardContent>
-            {(invites.data ?? []).length === 0 && <p className="text-sm text-zinc-500">None.</p>}
+            {(invites.data ?? []).length === 0 && <p className="text-sm text-warm-500">None.</p>}
             <ul className="grid gap-1 text-sm">
               {(invites.data ?? []).map((i: any) => (
                 <li key={i.id} className="flex items-center justify-between gap-2">

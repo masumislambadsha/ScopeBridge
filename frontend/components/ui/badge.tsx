@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const colors: Record<string, string> = {
-  gray: "bg-zinc-100 text-zinc-700 border-zinc-200",
+  gray: "bg-warm-100 text-warm-700 border-warm-200",
   blue: "bg-blue-50 text-blue-700 border-blue-200",
   green: "bg-green-50 text-green-700 border-green-200",
   amber: "bg-amber-50 text-amber-800 border-amber-200",

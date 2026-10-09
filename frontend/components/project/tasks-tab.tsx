@@ -104,8 +104,8 @@ export function TasksTab({ projectId }: { projectId: string }) {
             <Card key={t.id}>
               <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-center">
                 <div className="flex-1">
-                  <p className="font-medium"><span className="font-mono text-xs text-zinc-500">{t.code}</span> {t.title}</p>
-                  <p className="text-xs text-zinc-500">{t.requirement ? `${t.requirement.code} · ` : ""}{t.assignee?.name ?? "unassigned"} · {t.priority}</p>
+                  <p className="font-medium"><span className="font-mono text-xs text-warm-500">{t.code}</span> {t.title}</p>
+                  <p className="text-xs text-warm-500">{t.requirement ? `${t.requirement.code} · ` : ""}{t.assignee?.name ?? "unassigned"} · {t.priority}</p>
                 </div>
                 <Select aria-label="Move task" value={t.status} onChange={(e) => move.mutate({ id: t.id, to: e.target.value })}>
                   {COLS.map((c) => <option key={c} value={c}>{c}</option>)}
@@ -118,7 +118,7 @@ export function TasksTab({ projectId }: { projectId: string }) {
       <Dialog open={showGen} onClose={() => { setShowGen(false); setPreview(null); }} title="Generate tasks from approved scope" wide>
         <div className="grid gap-2">
           <div className="flex flex-wrap items-center gap-2 text-sm">
-            {(versions.data ?? []).length === 0 && <p className="text-zinc-500">No approved version yet.</p>}
+            {(versions.data ?? []).length === 0 && <p className="text-warm-500">No approved version yet.</p>}
             {(versions.data ?? []).map((v: any) => (
               <Button key={v.id} size="sm" variant="outline" onClick={() => previewGen.mutate({ versionId: v.id, only: onlyNew })}>
                 Preview from v{v.version}
@@ -128,12 +128,12 @@ export function TasksTab({ projectId }: { projectId: string }) {
           </div>
           {preview && (
             <>
-              <p className="text-sm text-zinc-600">{preview.length} proposed tasks. Edit titles below, then confirm.</p>
+              <p className="text-sm text-warm-600">{preview.length} proposed tasks. Edit titles below, then confirm.</p>
               {preview.map((t, i) => (
                 <div key={i} className="grid gap-1 rounded border p-2">
                   <Label>Title</Label>
                   <Input value={t.title} onChange={(e) => setPreview(preview.map((x, j) => j === i ? { ...x, title: e.target.value } : x))} />
-                  <p className="whitespace-pre-wrap text-xs text-zinc-500">{t.description}</p>
+                  <p className="whitespace-pre-wrap text-xs text-warm-500">{t.description}</p>
                 </div>
               ))}
               <Button disabled={preview.length === 0 || confirmBulk.isPending} onClick={() => confirmBulk.mutate(preview)}>Confirm + create {preview.length} tasks</Button>
@@ -150,8 +150,8 @@ import { useDraggable, useDroppable } from "@dnd-kit/core";
 function Column({ id, tasks, onMove }: { id: string; tasks: any[]; onMove: (id: string, to: string) => void }) {
   const { setNodeRef } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className="w-64 shrink-0 rounded-lg border bg-zinc-50 p-2">
-      <p className="mb-1 px-1 text-xs font-semibold text-zinc-600">{id} ({tasks.length})</p>
+    <div ref={setNodeRef} className="w-64 shrink-0 rounded-2xl border bg-warm-50 p-2">
+      <p className="mb-1 px-1 text-xs font-semibold text-warm-600">{id} ({tasks.length})</p>
       <div className="grid gap-1">
         {tasks.map((t: any) => (
           <DraggableTask key={t.id} task={t} onMove={(to) => onMove(t.id, to)} />
@@ -171,8 +171,8 @@ function DraggableTask({ task }: { task: any; onMove: (to: string) => void }) {
       {...attributes}
       className="cursor-grab rounded border bg-white p-2 text-sm active:cursor-grabbing"
     >
-      <p className="font-medium"><span className="font-mono text-xs text-zinc-500">{task.code}</span> {task.title}</p>
-      <p className="text-xs text-zinc-500">{task.assignee?.name ?? "unassigned"}</p>
+      <p className="font-medium"><span className="font-mono text-xs text-warm-500">{task.code}</span> {task.title}</p>
+      <p className="text-xs text-warm-500">{task.assignee?.name ?? "unassigned"}</p>
     </div>
   );
 }

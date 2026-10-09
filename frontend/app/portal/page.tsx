@@ -28,7 +28,7 @@ export default function PortalHome() {
               <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-center">
                 <div className="flex-1">
                   <Link href={`/portal/projects/${p.id}`} className="font-medium underline">{p.name}</Link>
-                  <p className="text-xs text-zinc-500">{p.projectTypeLabel ?? p.projectType} · {p.progress.completed}/{p.progress.total} tasks ({p.progress.percent}%)</p>
+                  <p className="text-xs text-warm-500">{p.projectTypeLabel ?? p.projectType} · {p.progress.completed}/{p.progress.total} tasks ({p.progress.percent}%)</p>
                 </div>
                 <StatusBadge status={p.status} />
               </CardContent>

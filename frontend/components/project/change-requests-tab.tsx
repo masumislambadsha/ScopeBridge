@@ -97,8 +97,8 @@ export function ChangeRequestsTab({ projectId }: { projectId: string }) {
           <Card key={c.id}>
             <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-center">
               <div className="flex-1">
-                <p className="font-medium"><span className="font-mono text-xs text-zinc-500">{c.code}</span> {c.title}</p>
-                <p className="flex flex-wrap items-center gap-1 text-xs text-zinc-500">
+                <p className="font-medium"><span className="font-mono text-xs text-warm-500">{c.code}</span> {c.title}</p>
+                <p className="flex flex-wrap items-center gap-1 text-xs text-warm-500">
                   <StatusBadge status={c.status} />
                   {c.aiClassification && <StatusBadge status={c.aiClassification} />}
                   by {c.requestedBy?.name}
@@ -117,7 +117,7 @@ export function ChangeRequestsTab({ projectId }: { projectId: string }) {
         {d && (
           <div className="grid gap-3 text-sm">
             <p className="whitespace-pre-wrap">{d.description}</p>
-            <p><StatusBadge status={d.status} /> {d.finalClassification && <><span className="text-xs text-zinc-500">PM verdict:</span> <StatusBadge status={d.finalClassification} /></>}</p>
+            <p><StatusBadge status={d.status} /> {d.finalClassification && <><span className="text-xs text-warm-500">PM verdict:</span> <StatusBadge status={d.finalClassification} /></>}</p>
             {d.aiClassification && (
               <Card>
                 <CardHeader><CardTitle>AI scope analysis <StatusBadge status={d.aiClassification} /></CardTitle></CardHeader>
@@ -126,19 +126,19 @@ export function ChangeRequestsTab({ projectId }: { projectId: string }) {
                   {(d.aiMatchedItems ?? []).length > 0 && (
                     <ul className="list-disc pl-5">{(d.aiMatchedItems ?? []).map((m: any, i: number) => <li key={i}>{m.title} — {m.reason}</li>)}</ul>
                   )}
-                  {d.aiImpact && <pre className="overflow-auto rounded bg-zinc-50 p-2 text-xs">{JSON.stringify(d.aiImpact, null, 2)}</pre>}
+                  {d.aiImpact && <pre className="overflow-auto rounded bg-warm-50 p-2 text-xs">{JSON.stringify(d.aiImpact, null, 2)}</pre>}
                   {(d.aiSuggestedRequirements ?? []).length > 0 && (
                     <div>
                       <p className="font-medium">Suggested requirements</p>
                       <ul className="list-disc pl-5">{(d.aiSuggestedRequirements ?? []).map((s: any, i: number) => <li key={i}>{s.title}</li>)}</ul>
                     </div>
                   )}
-                  <p className="text-xs text-zinc-500">AI suggests — the PM&apos;s classification is final.</p>
+                  <p className="text-xs text-warm-500">AI suggests — the PM&apos;s classification is final.</p>
                 </CardContent>
               </Card>
             )}
             {(d.tasks ?? []).length > 0 && (
-              <p className="text-xs text-zinc-600">Linked tasks: {(d.tasks ?? []).map((t: any) => `${t.code} (${t.status})`).join(", ")}</p>
+              <p className="text-xs text-warm-600">Linked tasks: {(d.tasks ?? []).map((t: any) => `${t.code} (${t.status})`).join(", ")}</p>
             )}
             {(d.status === "PENDING" || d.status === "UNDER_REVIEW") && (
               <div className="flex gap-2">

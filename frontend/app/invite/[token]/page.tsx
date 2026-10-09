@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { AuthShell } from "@/components/auth-shell";
 
 interface Preview {
   type: string;
@@ -42,40 +42,35 @@ export default function InvitePage({ params }: { params: { token: string } }) {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md flex-col justify-center p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Invitation</CardTitle>
-          <CardDescription>{session ? `Signed in as ${session.user.email}` : "You are invited to ScopeBridge."}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          {preview && (
-            <div className="grid gap-3">
-              <p className="text-sm">
-                {preview.type === "CLIENT_PORTAL" ? (
-                  <>You are invited to the client portal{preview.client ? <> for <b>{preview.client.name}</b></> : null} at <b>{preview.workspace.name}</b>.</>
-                ) : (
-                  <>You are invited to join <b>{preview.workspace.name}</b> as <b>{preview.role}</b>.</>
-                )}
-              </p>
-              <p className="text-xs text-zinc-500">Sent to {preview.email}</p>
-              {session ? (
-                <Button onClick={accept}>Accept invitation</Button>
-              ) : (
-                <div className="flex gap-2">
-                  <Link href={`/register?inviteToken=${params.token}`} className="flex-1 rounded-md bg-zinc-900 px-4 py-2 text-center text-sm text-white">
-                    Create account & accept
-                  </Link>
-                  <Link href={`/login?inviteToken=${params.token}`} className="flex-1 rounded-md border px-4 py-2 text-center text-sm">
-                    Log in & accept
-                  </Link>
-                </div>
-              )}
+    <AuthShell
+      title="Invitation"
+      description={session ? `Signed in as ${session.user.email}` : "You are invited to ScopeBridge."}
+    >
+      {error && <p className="text-sm font-medium text-red-600">{error}</p>}
+      {preview && (
+        <div className="grid gap-4">
+          <p className="text-[15px] leading-relaxed text-warm-700">
+            {preview.type === "CLIENT_PORTAL" ? (
+              <>You are invited to the client portal{preview.client ? <> for <b>{preview.client.name}</b></> : null} at <b>{preview.workspace.name}</b>.</>
+            ) : (
+              <>You are invited to join <b>{preview.workspace.name}</b> as <b>{preview.role}</b>.</>
+            )}
+          </p>
+          <p className="text-xs text-warm-500">Sent to {preview.email}</p>
+          {session ? (
+            <Button size="pill" onClick={accept}>Accept invitation</Button>
+          ) : (
+            <div className="flex gap-2">
+              <Link href={`/register?inviteToken=${params.token}`} className="flex-1 rounded-full bg-ink px-4 py-2.5 text-center text-sm font-semibold text-warm-50">
+                Create account & accept
+              </Link>
+              <Link href={`/login?inviteToken=${params.token}`} className="flex-1 rounded-full border border-warm-200 px-4 py-2.5 text-center text-sm font-semibold hover:border-sage-300">
+                Log in & accept
+              </Link>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </main>
+        </div>
+      )}
+    </AuthShell>
   );
 }

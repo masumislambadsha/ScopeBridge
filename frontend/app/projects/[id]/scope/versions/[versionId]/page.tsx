@@ -23,16 +23,16 @@ export default function ScopeVersionPage({ params }: { params: { id: string; ver
         {data && (
           <Card>
             <CardContent className="grid gap-3">
-              {data.summary && <p className="text-sm text-zinc-600">{data.summary}</p>}
+              {data.summary && <p className="text-sm text-warm-600">{data.summary}</p>}
               <div>
                 <p className="font-medium">Features ({(data.features ?? []).length})</p>
                 <ul className="grid gap-2">
                   {(data.features ?? []).map((f: any) => (
                     <li key={f.id} className="rounded border p-2 text-sm">
                       <p className="font-medium">{f.title}</p>
-                      <p className="text-zinc-600">{f.description}</p>
+                      <p className="text-warm-600">{f.description}</p>
                       {(f.acceptanceCriteria ?? []).length > 0 && (
-                        <ul className="mt-1 list-disc pl-5 text-xs text-zinc-600">
+                        <ul className="mt-1 list-disc pl-5 text-xs text-warm-600">
                           {f.acceptanceCriteria.map((c: any, i: number) => <li key={i}>Given {c.given}, when {c.when}, then {c.then}</li>)}
                         </ul>
                       )}
@@ -51,7 +51,7 @@ export default function ScopeVersionPage({ params }: { params: { id: string; ver
                     <div key={a.id} className="rounded border p-2 text-sm">
                       <p><StatusBadge status={a.status} /> {a.signatureName ?? ""} {a.decidedAt ? new Date(a.decidedAt).toLocaleString() : ""}</p>
                       {a.comment && <p className="italic">“{a.comment}”</p>}
-                      <p className="font-mono text-xs text-zinc-500">hash {a.contentHash}</p>
+                      <p className="font-mono text-xs text-warm-500">hash {a.contentHash}</p>
                     </div>
                   ))}
                 </div>

@@ -8,8 +8,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { ApiError, fieldErrors } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input, Label, FieldError } from "@/components/ui/input";
+import { AuthShell } from "@/components/auth-shell";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -39,38 +39,35 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>ScopeBridge</CardTitle>
-          <CardDescription>Log in to your agency workspace or client portal.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
-              <FieldError message={form.formState.errors.email?.message} />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" autoComplete="current-password" {...form.register("password")} />
-              <FieldError message={form.formState.errors.password?.message} />
-            </div>
-            {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Logging in…" : "Login"}
-            </Button>
-          </form>
-          <div className="mt-3 flex justify-between text-sm">
-            <Link href="/register" className="underline">Create account</Link>
-            <Link href="/forgot-password" className="underline">Forgot password?</Link>
-          </div>
-          <p className="mt-2 text-sm text-zinc-500">
-            Client? <Link href="/portal/login" className="underline">Open the client portal</Link>
-          </p>
-        </CardContent>
-      </Card>
-    </main>
+    <AuthShell
+      title="Welcome back"
+      description="Log in to your agency workspace or client portal."
+      footer={
+        <>
+          Client? <Link href="/portal/login" className="font-medium text-sage-600 underline underline-offset-4 hover:text-sage-700">Open the client portal</Link>
+        </>
+      }
+    >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
+          <FieldError message={form.formState.errors.email?.message} />
+        </div>
+        <div>
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" autoComplete="current-password" {...form.register("password")} />
+          <FieldError message={form.formState.errors.password?.message} />
+        </div>
+        {serverError && <p className="text-sm font-medium text-red-600">{serverError}</p>}
+        <Button type="submit" size="pill" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Logging in…" : "Login"}
+        </Button>
+      </form>
+      <div className="mt-4 flex justify-between text-sm">
+        <Link href="/register" className="font-medium text-sage-600 underline underline-offset-4 hover:text-sage-700">Create account</Link>
+        <Link href="/forgot-password" className="font-medium text-sage-600 underline underline-offset-4 hover:text-sage-700">Forgot password?</Link>
+      </div>
+    </AuthShell>
   );
 }

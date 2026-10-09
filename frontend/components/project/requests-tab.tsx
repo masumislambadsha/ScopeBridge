@@ -115,7 +115,7 @@ export function RequestsTab({ projectId }: { projectId: string }) {
             <ul className="grid gap-1 text-sm">
               {questions.map((q, i) => (
                 <li key={i} className="flex items-center justify-between gap-2 rounded border px-2 py-1">
-                  <span>{q.question} <span className="text-xs text-zinc-500">[{q.answerType}]</span></span>
+                  <span>{q.question} <span className="text-xs text-warm-500">[{q.answerType}]</span></span>
                   <button className="text-xs text-red-600 underline" onClick={() => setQuestions(questions.filter((_, j) => j !== i))}>remove</button>
                 </li>
               ))}
@@ -137,7 +137,7 @@ export function RequestsTab({ projectId }: { projectId: string }) {
             <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-center">
               <div className="flex-1">
                 <p className="font-medium">{r.title}</p>
-                <p className="text-xs text-zinc-500">{(r.questions ?? []).length} questions · {r.type}{r.deadline ? ` · due ${new Date(r.deadline).toLocaleDateString()}` : ""}</p>
+                <p className="text-xs text-warm-500">{(r.questions ?? []).length} questions · {r.type}{r.deadline ? ` · due ${new Date(r.deadline).toLocaleDateString()}` : ""}</p>
               </div>
               <StatusBadge status={r.status} />
               {r.status === "DRAFT" && <Button size="sm" onClick={() => setSendId(r.id)}>Send</Button>}

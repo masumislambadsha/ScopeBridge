@@ -29,11 +29,11 @@ export function SubmissionsTab({ projectId }: { projectId: string }) {
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium">{s.informationRequestId ? "Request answer" : "Additional info"}</span>
                   <StatusBadge status={s.status} />
-                  <span className="text-xs text-zinc-500">{new Date(s.createdAt).toLocaleString()}</span>
+                  <span className="text-xs text-warm-500">{new Date(s.createdAt).toLocaleString()}</span>
                 </div>
                 <dl className="mt-1 grid gap-1">
                   {Object.entries((s.answers ?? {}) as Record<string, string>).map(([k, v]) => (
-                    <div key={k}><dt className="text-xs font-medium text-zinc-500">{k}</dt><dd className="whitespace-pre-wrap">{v}</dd></div>
+                    <div key={k}><dt className="text-xs font-medium text-warm-500">{k}</dt><dd className="whitespace-pre-wrap">{v}</dd></div>
                   ))}
                 </dl>
                 {s.additionalInfo && <p className="mt-1 text-sm italic">{s.additionalInfo}</p>}
@@ -51,7 +51,7 @@ export function SubmissionsTab({ projectId }: { projectId: string }) {
             {(files.data ?? []).map((f: any) => (
               <li key={f.id} className="flex flex-wrap items-center gap-2 rounded border px-2 py-1">
                 <span className="font-medium">{f.originalName}</span>
-                <span className="text-xs text-zinc-500">{f.mimeType} · {(f.size / 1024).toFixed(1)} KB · by {f.uploadedBy?.name}</span>
+                <span className="text-xs text-warm-500">{f.mimeType} · {(f.size / 1024).toFixed(1)} KB · by {f.uploadedBy?.name}</span>
                 <StatusBadge status={f.extractionStatus} />
                 <a className="ml-auto text-xs underline" href={`${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/files/${f.id}/download`}>
                   Download

@@ -27,22 +27,22 @@ export default function PortalProjectPage({ params }: { params: { id: string } }
               <Card>
                 <CardHeader><CardTitle>Progress — {data.progress.percent}%</CardTitle></CardHeader>
                 <CardContent>
-                  <div className="h-2 overflow-hidden rounded bg-zinc-100">
-                    <div className="h-full bg-zinc-900" style={{ width: `${data.progress.percent}%` }} />
+                  <div className="h-2 overflow-hidden rounded bg-warm-100">
+                    <div className="h-full bg-ink" style={{ width: `${data.progress.percent}%` }} />
                   </div>
-                  <p className="mt-1 text-sm text-zinc-600">{data.progress.completed} of {data.progress.total} tasks complete</p>
+                  <p className="mt-1 text-sm text-warm-600">{data.progress.completed} of {data.progress.total} tasks complete</p>
                   <div className="mt-2 flex flex-wrap gap-2 text-sm">
-                    <Link className="rounded-md border px-3 py-1.5 hover:bg-zinc-50" href={`/portal/projects/${params.id}/scope`}>Review scope</Link>
-                    <Link className="rounded-md border px-3 py-1.5 hover:bg-zinc-50" href={`/portal/projects/${params.id}/change-requests`}>Change requests</Link>
-                    <Link className="rounded-md border px-3 py-1.5 hover:bg-zinc-50" href={`/portal/projects/${params.id}/messages`}>Messages</Link>
-                    <Link className="rounded-md border px-3 py-1.5 hover:bg-zinc-50" href={`/portal/projects/${params.id}/requirements`}>Requirements</Link>
+                    <Link className="rounded-xl border px-3 py-1.5 hover:bg-sage-50/40" href={`/portal/projects/${params.id}/scope`}>Review scope</Link>
+                    <Link className="rounded-xl border px-3 py-1.5 hover:bg-sage-50/40" href={`/portal/projects/${params.id}/change-requests`}>Change requests</Link>
+                    <Link className="rounded-xl border px-3 py-1.5 hover:bg-sage-50/40" href={`/portal/projects/${params.id}/messages`}>Messages</Link>
+                    <Link className="rounded-xl border px-3 py-1.5 hover:bg-sage-50/40" href={`/portal/projects/${params.id}/requirements`}>Requirements</Link>
                   </div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader><CardTitle>Open requests ({data.informationRequests.length})</CardTitle></CardHeader>
                 <CardContent>
-                  {data.informationRequests.length === 0 && <p className="text-sm text-zinc-500">Nothing waiting on you.</p>}
+                  {data.informationRequests.length === 0 && <p className="text-sm text-warm-500">Nothing waiting on you.</p>}
                   <ul className="grid gap-1 text-sm">
                     {data.informationRequests.map((r: any) => (
                       <li key={r.id}><Link className="underline" href={`/portal/projects/${params.id}/requests/${r.id}`}>{r.title}</Link> <StatusBadge status={r.status} /></li>
@@ -57,7 +57,7 @@ export default function PortalProjectPage({ params }: { params: { id: string } }
                     {data.approvals.map((a: any) => (
                       <li key={a.id}>Scope v{a.scopeVersion?.version} <StatusBadge status={a.status} /> <Link className="underline" href={`/portal/projects/${params.id}/scope`}>Review</Link></li>
                     ))}
-                    {data.approvals.length === 0 && <li className="text-zinc-500">None.</li>}
+                    {data.approvals.length === 0 && <li className="text-warm-500">None.</li>}
                   </ul>
                 </CardContent>
               </Card>
