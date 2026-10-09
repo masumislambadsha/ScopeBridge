@@ -1,20 +1,58 @@
-'use client';
-import { useState } from 'react';
-import { useAuth } from '@/lib/auth';
-import { Button, Input } from '@/components/ui/primitives';
+"use client";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/lib/auth";
+import { ApiError, fieldErrors } from "@/lib/api";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input, Label, FieldError } from "@/components/ui/input";
 
-export default function PortalLogin() {
+const schema = z.object({
+  email: z.string().email("Enter a valid email"),
+  password: z.string().min(1, "Password is required"),
+});
+
+export default function PortalLoginPage() {
   const { login } = useAuth();
-  const [email, setEmail] = useState(''); const [password, setPassword] = useState(''); const [err, setErr] = useState('');
+  const [serverError, setServerError] = useState("");
+  const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) });
+
+  async function onSubmit(values: z.infer<typeof schema>) {
+    setServerError("");
+    try {
+      await login(values.email, values.password);
+    } catch (e) {
+      setServerError(e instanceof ApiError ? e.message : "Login failed");
+      void fieldErrors;
+    }
+  }
+
   return (
-    <main className="mx-auto max-w-sm p-10">
-      <h1 className="mb-4 text-2xl font-bold">Client portal login</h1>
-      <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <div className="h-2" />
-      <Input placeholder="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      {err && <p className="mt-2 text-sm text-red-600">{err}</p>}
-      <div className="h-3" />
-      <Button onClick={() => login(email, password).catch((e) => setErr(e.message))}>Login</Button>
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center p-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Client Portal</CardTitle>
+          <CardDescription>Review scopes, answer requests, track progress.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3">
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" {...form.register("email")} />
+              <FieldError message={form.formState.errors.email?.message} />
+            </div>
+            <div>
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" {...form.register("password")} />
+              <FieldError message={form.formState.errors.password?.message} />
+            </div>
+            {serverError && <p className="text-sm text-red-600">{serverError}</p>}
+            <Button type="submit" disabled={form.formState.isSubmitting}>Log in to portal</Button>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   );
 }

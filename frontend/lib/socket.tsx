@@ -1,22 +1,71 @@
-'use client';
-import { createContext, useContext, useEffect, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-import { getToken } from './api';
+"use client";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
+import { io, Socket } from "socket.io-client";
+import { useQueryClient } from "@tanstack/react-query";
+import { getAccessToken } from "./api";
 
-const Ctx = createContext<{ socket: Socket | null; events: Array<{ e: string; d: any }> }>({ socket: null, events: [] });
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:4000";
+
+/** Socket events → React Query cache invalidation (§3.5). */
+const INVALIDATE: Record<string, string[][]> = {
+  "notification:new": [["notifications"]],
+  "message:new": [["messages"]],
+  "ai:run:updated": [["ai-runs"], ["requirements"], ["readiness"], ["change-requests"]],
+  "submission:new": [["submissions"], ["information-requests"]],
+  "requirement:updated": [["requirements"], ["readiness"], ["traceability"]],
+  "scope:version:updated": [["scope"], ["scope-versions"], ["traceability"]],
+  "approval:updated": [["approvals"], ["scope-versions"], ["change-requests"], ["traceability"]],
+  "task:updated": [["tasks"], ["my-tasks"], ["traceability"], ["dashboard"]],
+  "change-request:updated": [["change-requests"], ["traceability"]],
+};
+
+const Ctx = createContext<{ socket: Socket | null; joinedProject: string | null; joinProject: (id: string | null) => void }>({
+  socket: null,
+  joinedProject: null,
+  joinProject: () => undefined,
+});
 
 export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [events, setEvents] = useState<Array<{ e: string; d: any }>>([]);
+  const [joinedProject, setJoinedProject] = useState<string | null>(null);
+  const joinedRef = useRef<string | null>(null);
+  const qc = useQueryClient();
+
+  // (Re)connect whenever we have a token — after login, refresh, or reload.
   useEffect(() => {
-    const token = getToken();
-    if (!token) return;
-    const s = io(process.env.NEXT_PUBLIC_SOCKET_URL ?? 'http://localhost:4000', { auth: { token } });
-    const all = ['submission:new','ai:extraction:done','ai:extraction:failed','ai:scope:ready','approval:requested','scope:approved','scope:rejected','task:assigned','tasks:created','task:updated','change-request:new','change-request:analyzed','change-request:decided','notification:new','message:new'];
-    all.forEach((e) => s.on(e, (d: any) => setEvents((prev) => [{ e, d }, ...prev].slice(0, 50))));
-    setSocket(s);
-    return () => { s.disconnect(); };
-  }, []);
-  return <Ctx.Provider value={{ socket, events }}>{children}</Ctx.Provider>;
+    let s: Socket | null = null;
+    let alive = true;
+    const t = setInterval(() => {
+      const token = getAccessToken();
+      if (token && !s && alive) {
+        s = io(SOCKET_URL, { auth: { token } });
+        for (const ev of Object.keys(INVALIDATE)) {
+          s.on(ev, () => {
+            for (const key of INVALIDATE[ev]) void qc.invalidateQueries({ queryKey: key });
+          });
+        }
+        if (joinedRef.current) s.emit("project:join", joinedRef.current);
+        setSocket(s);
+      } else if (!token && s) {
+        s.disconnect();
+        s = null;
+        setSocket(null);
+      }
+    }, 1000);
+    return () => {
+      alive = false;
+      clearInterval(t);
+      s?.disconnect();
+    };
+  }, [qc]);
+
+  function joinProject(id: string | null) {
+    joinedRef.current = id;
+    setJoinedProject(id);
+    if (id) socket?.emit("project:join", id);
+  }
+
+  return <Ctx.Provider value={{ socket, joinedProject, joinProject }}>{children}</Ctx.Provider>;
 }
+
 export const useSocket = () => useContext(Ctx);

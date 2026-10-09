@@ -1,37 +1,73 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
-import { Nav, Page, Card, Button, Input } from '@/components/ui/primitives';
-import { useSocket } from '@/lib/socket';
+"use client";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { useSocket } from "@/lib/socket";
+import { AgencyShell } from "@/components/shells/agency-shell";
+import { AgencyGuard } from "@/components/shells/guards";
+import { PageHeader } from "@/components/ui/layout";
+import { ListSkeleton, ErrorState } from "@/components/ui/states";
+import { StatusBadge } from "@/components/ui/badge";
+import { Tabs } from "@/components/ui/dialog";
+import { OverviewTab } from "@/components/project/overview-tab";
+import { RequestsTab } from "@/components/project/requests-tab";
+import { SubmissionsTab } from "@/components/project/submissions-tab";
+import { RequirementsTab } from "@/components/project/requirements-tab";
+import { ScopeTab } from "@/components/project/scope-tab";
+import { TasksTab } from "@/components/project/tasks-tab";
+import { ChangeRequestsTab } from "@/components/project/change-requests-tab";
+import { MessagesTab } from "@/components/project/messages-tab";
+import { ActivityTab } from "@/components/project/activity-tab";
+import { useEffect } from "react";
 
-export default function ProjectDetail({ params }: { params: { id: string } }) {
-  const [p, setP] = useState<any>(null);
-  const [msgs, setMsgs] = useState<any[]>([]);
-  const [msg, setMsg] = useState('');
-  const { socket } = useSocket();
-  const load = () => {
-    api.get(`/api/projects/${params.id}`).then((j: any) => setP(j.data)).catch(() => {});
-    api.get(`/api/messages?projectId=${params.id}`).then((j: any) => setMsgs(j.data ?? [])).catch(() => {});
-  };
-  useEffect(() => { load(); }, []);
-  useEffect(() => { socket?.emit('project:join', params.id); }, [socket]);
+const TABS = [
+  { id: "overview", label: "Overview" },
+  { id: "requests", label: "Requests" },
+  { id: "submissions", label: "Submissions & Files" },
+  { id: "requirements", label: "Requirements" },
+  { id: "scope", label: "Scope" },
+  { id: "tasks", label: "Tasks" },
+  { id: "changes", label: "Change Requests" },
+  { id: "messages", label: "Messages" },
+  { id: "activity", label: "Activity" },
+];
+
+export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+  const [tab, setTab] = useState("overview");
+  const { joinProject } = useSocket();
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["project", params.id],
+    queryFn: () => api.get<any>(`/api/projects/${params.id}`).then((r) => r.data),
+  });
+
+  useEffect(() => {
+    joinProject(params.id);
+    return () => joinProject(null);
+  }, [params.id, joinProject]);
+
   return (
-    <>
-      <Nav />
-      <Page title={p?.name ?? 'Project'}>
-        <div className="flex gap-2 text-sm">
-          <a className="underline" href={`/projects/${params.id}/requirements`}>Requirements</a>
-          <a className="underline" href={`/projects/${params.id}/scope`}>Scope</a>
-          <a className="underline" href={`/projects/${params.id}/tasks`}>Tasks</a>
-          <a className="underline" href={`/projects/${params.id}/change-requests`}>Change requests</a>
-        </div>
-        <Card><pre className="overflow-auto text-xs">{JSON.stringify(p, null, 2)}</pre></Card>
-        <h2 className="my-2 font-semibold">Messages</h2>
-        <Card><ul className="text-sm">{msgs.map((m) => <li key={m.id}><b>{m.sender?.name}:</b> {m.content}</li>)}</ul>
-          <div className="mt-2 flex gap-2"><Input value={msg} onChange={(e) => setMsg(e.target.value)} placeholder="Write a message" />
-            <Button onClick={async () => { await api.post('/api/messages', { projectId: params.id, content: msg }); setMsg(''); load(); }}>Send</Button></div>
-        </Card>
-      </Page>
-    </>
+    <AgencyGuard>
+      <AgencyShell>
+        {isLoading && <ListSkeleton rows={5} />}
+        {error && <ErrorState message="Could not load project." onRetry={() => refetch()} />}
+        {data && (
+          <>
+            <PageHeader title={data.name} hint={`${data.client?.name ?? ""} · ${data.projectType}`} actions={<StatusBadge status={data.status} />} />
+            <Tabs tabs={TABS} active={tab} onChange={setTab} />
+            <div className="mt-3">
+              {tab === "overview" && <OverviewTab projectId={params.id} />}
+              {tab === "requests" && <RequestsTab projectId={params.id} />}
+              {tab === "submissions" && <SubmissionsTab projectId={params.id} />}
+              {tab === "requirements" && <RequirementsTab projectId={params.id} />}
+              {tab === "scope" && <ScopeTab projectId={params.id} />}
+              {tab === "tasks" && <TasksTab projectId={params.id} />}
+              {tab === "changes" && <ChangeRequestsTab projectId={params.id} />}
+              {tab === "messages" && <MessagesTab projectId={params.id} />}
+              {tab === "activity" && <ActivityTab projectId={params.id} />}
+            </div>
+          </>
+        )}
+      </AgencyShell>
+    </AgencyGuard>
   );
 }

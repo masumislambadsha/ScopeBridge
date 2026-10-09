@@ -3,41 +3,92 @@ services:
     name: scopebridge-api
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npm run migrate:deploy && npm start
+    # Install WITH devDependencies so tsc + prisma exist at build time (§2.2 D19).
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    startCommand: npx prisma migrate deploy && node dist/index.js
+    healthCheckPath: /ready
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
         sync: false
+      - key: DIRECT_URL
+        sync: false
       - key: REDIS_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: BACKEND_PUBLIC_URL
         sync: false
       - key: JWT_ACCESS_SECRET
         sync: false
       - key: JWT_REFRESH_SECRET
         sync: false
-      - key: FRONTEND_URL
-        sync: false
+      - key: AI_PROVIDER
+        value: gemini
       - key: GEMINI_API_KEY
         sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: STORAGE_DRIVER
+        value: cloudinary
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
         sync: false
       - key: CLOUDINARY_API_SECRET
         sync: false
+      - key: MAIL_ENABLED
+        value: true
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        value: ScopeBridge <no-reply@scopebridge.app>
   - type: worker
     name: scopebridge-worker
     runtime: node
     rootDir: backend
-    buildCommand: npm install && npx prisma generate && npm run build
-    startCommand: npm run worker
+    buildCommand: npm ci --include=dev && npx prisma generate && npm run build
+    # Compiled worker, not tsx (tsx is a devDependency, §2.2 D19).
+    startCommand: node dist/workers/worker.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
         sync: false
+      - key: DIRECT_URL
+        sync: false
       - key: REDIS_URL
         sync: false
+      - key: AI_PROVIDER
+        value: gemini
       - key: GEMINI_API_KEY
         sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
+      - key: STORAGE_DRIVER
+        value: cloudinary
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: MAIL_ENABLED
+        value: true
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        value: 587
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM
+        value: ScopeBridge <no-reply@scopebridge.app>
