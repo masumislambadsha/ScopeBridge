@@ -1,13 +1,16 @@
 # PROJECT_BOARD.md — Todo / In Progress / Review / Done
 
-## Todo (Phase 1+)
-#11–#13, #15, #17–#30, #33–#58 (all open except Phase 0 items).
+## Todo
+- Human code review of PRs by teammates (spec requirement).
+- `npm install` at root (brings declared deps: jwt9/multer2/vitest/supertest/nodemailer/unpdf/mammoth/pg/frontend libs), then: `npm test`, `npm run test:e2e`, `npm run build`, `npm audit --omit=dev --audit-level=high`.
+- Deploy per `docs/DEPLOYMENT.md` (Neon → Render API + worker → Vercel), then public-URL smoke test.
 
 ## In Progress
-Phase 0 (`chore/setup`): #55 (partial — develop/PR-docs/issues now; ERD+docs in Phase 11), #30 (partial — CI skeleton; E2E in Phase 10).
+(none — MVP complete pending review/deploy.)
 
 ## Review
-(none — local merges after self-review checklist in PR files.)
+- PR 01 `chore/setup`, PR 02 `feature/foundation` (backend Phases 1–9), PR 03 `feature/frontend-shell` (Phases 10–12 minus live deploy) — recorded in `docs/pull-requests/`.
 
 ## Done
-- Phase 0 setup: spec/AGENTS/PROGRESS/DECISIONS, `develop`, compose+Mailpit, root scripts, ESLint+Prettier (typecheck+lint green), CI skeleton, templates, CONTRIBUTING, ISSUES + board.
+- All 32 feature issues (#1–#32) and all 26 bug issues (#33–#58) implemented and covered (smoke + vitest suites for CI + Playwright specs).
+- Definition of Done: everything except credential-dependent deployment steps (see final report in PR 04).

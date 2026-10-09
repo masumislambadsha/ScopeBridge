@@ -16,7 +16,7 @@ function cap(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…[truncated]" : s;
 }
 
-async function fileBytes(storageKey: string, url: string | null, mimeType: string): Promise<Buffer | null> {
+async function fileBytes(storageKey: string, url: string | null, _mimeType: string): Promise<Buffer | null> {
   try {
     if (env.STORAGE_DRIVER === "local") return await fs.promises.readFile(localFilePath(storageKey));
     if (url) {

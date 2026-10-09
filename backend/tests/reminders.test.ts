@@ -13,7 +13,7 @@ describe("reminders", () => {
 
   it("SENT IR past the interval is reminded once (counter-gated)", async () => {
     const pm = authed(fx.pm.token);
-    let r = await pm.post("/api/information-requests").send({
+    const r = await pm.post("/api/information-requests").send({
       projectId: fx.projectId, title: "Old IR",
       questions: [{ id: "q1", question: "Q?", answerType: "text", required: true }],
     });
@@ -39,7 +39,7 @@ describe("reminders", () => {
   it("task deadline warnings fire once per task", async () => {
     const { versionId } = await (await import("./helpers")).makeApprovedScope(fx);
     const pm = authed(fx.pm.token);
-    let r = await pm.post("/api/tasks").send({
+    const r = await pm.post("/api/tasks").send({
       projectId: fx.projectId, scopeVersionId: versionId, title: "Urgent",
       assigneeId: fx.dev.id, deadline: new Date(Date.now() + 3600 * 1000).toISOString(),
     });

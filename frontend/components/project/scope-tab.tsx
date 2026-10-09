@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input, Label, Textarea, Select } from "@/components/ui/input";
 import { ListSkeleton, EmptyState, ErrorState, AiDraftLabel } from "@/components/ui/states";
 import { StatusBadge } from "@/components/ui/badge";
-import { Dialog, ConfirmDialog } from "@/components/ui/dialog";
+import { ConfirmDialog } from "@/components/ui/dialog";
 
 interface Feature {
   id: string;

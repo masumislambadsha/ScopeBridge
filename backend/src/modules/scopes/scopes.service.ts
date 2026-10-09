@@ -153,7 +153,7 @@ export async function createVersion(access: Access, actorId: string, scopeId: st
   const project = await prisma.project.findUnique({ where: { id: scope.projectId } });
   if (!project || project.workspaceId !== access.workspaceId) throw notFound("Scope not found");
   await assertNoOpenVersion(scopeId);
-  let base = basedOnVersionId
+  const base = basedOnVersionId
     ? await prisma.scopeVersion.findUnique({ where: { id: basedOnVersionId } })
     : scope.versions.find((v) => v.status === "APPROVED") ?? scope.versions[0];
   if (!base || base.scopeId !== scopeId) throw new AppError("VALIDATION_ERROR", "Base version not found in this scope");

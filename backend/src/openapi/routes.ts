@@ -34,7 +34,7 @@ import {
   taskIdParam, generateTasksSchema, bulkTasksSchema,
 } from "../modules/tasks/tasks.schemas";
 import {
-  createCRSchema, patchCRSchema, crsQuerySchema, crIdParam,
+  patchCRSchema, crsQuerySchema, crIdParam,
   approveCRSchema, rejectCRSchema,
 } from "../modules/change-requests/change-requests.schemas";
 import { createMessageSchema, messagesQuerySchema } from "../modules/messages/messages.schemas";

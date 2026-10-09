@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { AgencyShell } from "@/components/shells/agency-shell";
 import { AgencyGuard } from "@/components/shells/guards";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/layout";
 import { ListSkeleton, ErrorState } from "@/components/ui/states";
 import { StatusBadge } from "@/components/ui/badge";

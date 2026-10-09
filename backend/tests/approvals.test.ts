@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { authed, truncateAll, makeFixture, makeApprovedScope, expectCode, type Fixture } from "./helpers";
+import { authed, truncateAll, makeFixture, expectCode, type Fixture } from "./helpers";
 
 /** FR-17/18: approval integrity — only the client, only once, hash-checked, immutable. */
 describe("approval integrity", () => {

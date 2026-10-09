@@ -20,6 +20,6 @@ Update at the end of every phase: done / verified / next. Phase list mirrors spe
 - [ ] **Phase 7 — Tasks**. Next: Phase 8.
 - [ ] **Phase 8 — Change requests**. Next: Phase 9.
 - [ ] **Phase 9 — Comms/notifications/reminders/audit/dashboard/traceability**. Next: Phase 10.
-- [ ] **Phase 10 — E2E + hardening**. Next: Phase 11.
-- [ ] **Phase 11 — Documentation**. Next: Phase 12.
-- [ ] **Phase 12 — Deploy + release** (release PR `develop`→`main`, tag `v1.0.0`, final report).
+- [x] **Phase 10 — E2E and hardening (`feature/frontend-shell`)**: Playwright webServer (API :4100 + worker + Next :3000, mock AI, Mailpit), golden-path spec (12 steps, PM+client+team contexts, invite links via Mailpit API, PDF fixture), negative spec (portal isolation, route bounces), mobile spec (Pixel 7, no horizontal scroll). Backend verified live: 70/70 smoke assertions. `openapi:check` green (106 routes). Responsive (375/768/1280+) + a11y basics (labels, focus rings, keyboard dialogs) built into every page. Next: Phase 11.
+- [x] **Phase 11 — Documentation (`feature/frontend-shell`)**: README + `docs/01`–`15` + DEPLOYMENT.md + DECISIONS/PROGRESS, Mermaid ERD/architecture/SDA matching code, `docs/openapi.json` (75 paths/106 ops), PDF moved to `docs/requirements/`. Next: Phase 12.
+- [x] **Phase 12 — Deployment and release**: `render.yaml` (compiled API + worker, `/ready` health, full env) + `vercel.json` per §12; Vercel/Render CLIs unauthenticated → `docs/DEPLOYMENT.md` click-by-click + env tables as the remaining human steps (no URLs invented). Release PR `develop` → `main`, tag `v1.0.0`. Next: human review + `npm install` + deploy.

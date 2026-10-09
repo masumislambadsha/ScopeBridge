@@ -35,7 +35,7 @@ export default function InvitePage({ params }: { params: { token: string } }) {
       toast.success("Invitation accepted");
       await reload();
       router.push(preview?.type === "CLIENT_PORTAL" ? "/portal" : "/dashboard");
-    } catch (e) {
+    } catch {
       // New user: register with the invite token attached.
       router.push(`/register?inviteToken=${params.token}`);
     }

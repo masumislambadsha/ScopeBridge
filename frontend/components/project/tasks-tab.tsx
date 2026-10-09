@@ -5,7 +5,7 @@ import { DndContext, useSensor, useSensors, PointerSensor, DragEndEvent } from "
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input, Label, Select } from "@/components/ui/input";
 import { ListSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 import { Dialog } from "@/components/ui/dialog";

@@ -7,7 +7,7 @@ import { failBody } from "../core/http";
 function store(prefix: string) {
   return new RedisStore({
     prefix,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     sendCommand: (...args: string[]) => (redis as any).call(...args),
   });
 }
