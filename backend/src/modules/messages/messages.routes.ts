@@ -7,16 +7,17 @@ import * as C from "./messages.controller";
 import { createMessageSchema, messagesQuerySchema } from "./messages.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 r.post(
   "/messages",
+  requireAuth,
   validate(createMessageSchema),
   requireProjectAccess("message.write", (req) => (req.body as { projectId?: string }).projectId),
   ah(C.create),
 );
 r.get(
   "/messages",
+  requireAuth,
   validate(messagesQuerySchema, "query"),
   requireProjectAccess("message.read", (req) => (req.query as { projectId?: string }).projectId),
   ah(C.list),

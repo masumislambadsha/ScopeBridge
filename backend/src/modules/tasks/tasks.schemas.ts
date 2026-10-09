@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { datetimeNullableOptional, datetimeOptional } from "../../core/zod";
 
 export const createTaskSchema = z.object({
   projectId: z.string().min(1),
@@ -9,7 +10,7 @@ export const createTaskSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(8000).optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).default("MEDIUM"),
-  deadline: z.string().datetime().optional(),
+  deadline: datetimeOptional,
 });
 
 export const patchTaskSchema = z.object({
@@ -18,7 +19,7 @@ export const patchTaskSchema = z.object({
   assigneeId: z.string().min(1).nullable().optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).optional(),
   status: z.enum(["TODO", "IN_PROGRESS", "REVIEW", "COMPLETED"]).optional(),
-  deadline: z.string().datetime().nullable().optional(),
+  deadline: datetimeNullableOptional,
 });
 
 export const tasksQuerySchema = z.object({
@@ -48,6 +49,6 @@ export const bulkTasksSchema = z.object({
     changeRequestId: z.string().min(1).optional(),
     assigneeId: z.string().min(1).optional(),
     priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).default("MEDIUM"),
-    deadline: z.string().datetime().optional(),
+    deadline: datetimeOptional,
   })).min(1).max(100),
 });

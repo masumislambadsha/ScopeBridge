@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
@@ -15,6 +15,8 @@ export function MessagesTab({ projectId }: { projectId: string }) {
   const [text, setText] = useState("");
   const [visibility, setVisibility] = useState<"CLIENT" | "INTERNAL">("CLIENT");
   const [before, setBefore] = useState<string | null>(null);
+  // Edit sequence: a late onSuccess must never wipe text typed after submit.
+  const seq = useRef(0);
 
   const msgs = useQuery({
     queryKey: ["messages", projectId, before],
@@ -25,9 +27,14 @@ export function MessagesTab({ projectId }: { projectId: string }) {
   });
 
   const send = useMutation({
-    mutationFn: () => api.post("/api/messages", { projectId, content: text, visibility }),
-    onSuccess: () => {
-      setText("");
+    mutationFn: async () => {
+      const mySeq = ++seq.current;
+      const res = await api.post("/api/messages", { projectId, content: text, visibility });
+      return { res, mySeq };
+    },
+    onSuccess: ({ mySeq }) => {
+      // Only clear when nothing newer was typed while the request was in flight.
+      if (mySeq === seq.current) setText("");
       void qc.invalidateQueries({ queryKey: ["messages", projectId] });
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Send failed"),
@@ -40,7 +47,7 @@ export function MessagesTab({ projectId }: { projectId: string }) {
     <div className="grid gap-3">
       <Card>
         <CardContent className="grid gap-2">
-          <Textarea aria-label="Message" placeholder="Write a message…" value={text} onChange={(e) => setText(e.target.value)} />
+          <Textarea aria-label="Message" placeholder="Write a message…" value={text} onChange={(e) => { seq.current++; setText(e.target.value); }} />
           <div className="flex items-center gap-2">
             {canInternal && (
               <select aria-label="Visibility" className="h-9 rounded-md border border-zinc-300 px-2 text-sm" value={visibility} onChange={(e) => setVisibility(e.target.value as "CLIENT" | "INTERNAL")}>

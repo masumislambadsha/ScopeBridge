@@ -14,7 +14,7 @@ describe("rbac matrix", () => {
     const dev = authed(fx.dev.token);
     let r = await dev.delete(`/api/projects/${fx.projectId}`);
     expect(r.status).toBe(403);
-    r = await dev.post("/api/clients").send({ workspaceId: fx.workspaceId, name: "X", email: "x@y.z" });
+    r = await dev.post("/api/clients").send({ workspaceId: fx.workspaceId, name: "X", email: "x@y.zz" });
     expect(r.status).toBe(403);
     r = await dev.post("/api/change-requests").send({ projectId: fx.projectId, title: "T", description: "D" });
     expect([403, 409]).toContain(r.status);
@@ -42,8 +42,9 @@ describe("rbac matrix", () => {
 
   it("CLIENT can decide own approvals but nothing else", async () => {
     const client = authed(fx.clientUser.token);
+    // Client-only users hold no workspace membership → 404 (never leak).
     let r = await client.post("/api/projects").send({ workspaceId: fx.workspaceId, clientId: fx.clientId, name: "Nope" });
-    expect(r.status).toBe(403);
+    expect(r.status).toBe(404);
     r = await client.post("/api/tasks").send({ projectId: fx.projectId, scopeVersionId: "x", title: "T" });
     expect(r.status).toBe(403);
     r = await client.get("/api/tasks");
@@ -69,7 +70,7 @@ describe("rbac matrix", () => {
     const pm = authed(fx.pm.token);
     let r = await pm.patch(`/api/workspaces/${fx.workspaceId}`).send({ name: "Hijack" });
     expect(r.status).toBe(403);
-    r = await pm.post(`/api/workspaces/${fx.workspaceId}/members`).send({ email: "z@z.z", role: "TEAM_MEMBER" });
+    r = await pm.post(`/api/workspaces/${fx.workspaceId}/members`).send({ email: "z@z.zz", role: "TEAM_MEMBER" });
     expect(r.status).toBe(403);
     r = await pm.post("/api/projects").send({ workspaceId: fx.workspaceId, clientId: fx.clientId, name: "PM project" });
     expect(r.status).toBe(201);

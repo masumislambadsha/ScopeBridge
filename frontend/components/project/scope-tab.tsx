@@ -117,8 +117,8 @@ export function ScopeTab({ projectId }: { projectId: string }) {
     setEditing(true);
   }
 
-  function addFeature(reqId?: string) {
-    setFeatures([...features, { id: `f${Date.now()}`, title: "", description: "", priority: "MEDIUM", requirementIds: reqId ? [reqId] : [], acceptanceCriteria: [] }]);
+  function addFeature(reqId?: string, reqTitle?: string) {
+    setFeatures([...features, { id: `f${Date.now()}`, title: reqTitle ?? "", description: "", priority: "MEDIUM", requirementIds: reqId ? [reqId] : [], acceptanceCriteria: [] }]);
   }
 
   return (
@@ -210,7 +210,7 @@ export function ScopeTab({ projectId }: { projectId: string }) {
                   <p className="mb-1 text-sm font-medium">Build from requirements</p>
                   <div className="flex flex-wrap gap-1">
                     {(reqs.data ?? []).filter((r: any) => ["READY", "APPROVED"].includes(r.status)).map((r: any) => (
-                      <button key={r.id} className="rounded-full border px-2 py-1 text-xs hover:bg-zinc-50" onClick={() => addFeature(r.id)}>
+                      <button key={r.id} className="rounded-full border px-2 py-1 text-xs hover:bg-zinc-50" onClick={() => addFeature(r.id, r.title)}>
                         + {r.code} {r.title.slice(0, 30)}
                       </button>
                     ))}

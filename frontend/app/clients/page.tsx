@@ -18,6 +18,7 @@ import { ListSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 import { StatusBadge } from "@/components/ui/badge";
 
 const schema = z.object({ name: z.string().min(1), email: z.string().email(), company: z.string().optional() });
+type FormValues = z.infer<typeof schema> & { workspaceId: string };
 
 export default function ClientsPage() {
   const { workspaceId } = useWorkspace();
@@ -32,7 +33,7 @@ export default function ClientsPage() {
   });
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) });
   const create = useMutation({
-    mutationFn: (v: z.infer<typeof schema>) => api.post("/api/clients", { ...v, workspaceId }),
+    mutationFn: (v: FormValues) => api.post("/api/clients", v),
     onSuccess: () => {
       toast.success("Client created");
       form.reset();
@@ -51,8 +52,14 @@ export default function ClientsPage() {
     <AgencyGuard>
       <AgencyShell>
         <PageHeader title="Clients" />
-        <Card><CardContent>
-          <form onSubmit={form.handleSubmit((v) => create.mutate(v))} className="grid gap-2 sm:grid-cols-4 sm:items-end">
+        {!workspaceId && (
+          <EmptyState title="Select a workspace" hint="Create or select a workspace first." action={<Link href="/workspaces" className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white">Go to workspaces</Link>} />
+        )}
+        {workspaceId && (
+          <>
+            <Card>
+              <CardContent>
+          <form onSubmit={form.handleSubmit((v) => create.mutate({ ...v, workspaceId: workspaceId as string }))} className="grid gap-2 sm:grid-cols-4 sm:items-end">
             <div><Label htmlFor="name">Name</Label><Input id="name" {...form.register("name")} /><FieldError message={form.formState.errors.name?.message} /></div>
             <div><Label htmlFor="email">Email</Label><Input id="email" type="email" {...form.register("email")} /><FieldError message={form.formState.errors.email?.message} /></div>
             <div><Label htmlFor="company">Company</Label><Input id="company" {...form.register("company")} /></div>
@@ -102,6 +109,8 @@ export default function ClientsPage() {
             </>
           )}
         </div>
+        </>
+        )}
       </AgencyShell>
     </AgencyGuard>
   );

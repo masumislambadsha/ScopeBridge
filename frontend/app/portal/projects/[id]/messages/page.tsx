@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { use, useRef, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
@@ -11,18 +11,26 @@ import { Textarea } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/layout";
 import { ListSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 
-export default function PortalMessagesPage({ params }: { params: { id: string } }) {
+export default function PortalMessagesPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const qc = useQueryClient();
   const [text, setText] = useState("");
+  // Edit sequence: a late onSuccess must never wipe text typed after submit.
+  const seq = useRef(0);
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["portal-messages", params.id],
-    queryFn: () => api.get<any[]>(`/api/messages?projectId=${params.id}&limit=50`).then((r) => r.data),
+    queryKey: ["portal-messages", id],
+    queryFn: () => api.get<any[]>(`/api/messages?projectId=${id}&limit=50`).then((r) => r.data),
   });
   const send = useMutation({
-    mutationFn: () => api.post("/api/messages", { projectId: params.id, content: text }),
-    onSuccess: () => {
-      setText("");
-      void qc.invalidateQueries({ queryKey: ["portal-messages", params.id] });
+    mutationFn: async () => {
+      const mySeq = ++seq.current;
+      const res = await api.post("/api/messages", { projectId: id, content: text });
+      return { res, mySeq };
+    },
+    onSuccess: ({ mySeq }) => {
+      // Only clear when nothing newer was typed while the request was in flight.
+      if (mySeq === seq.current) setText("");
+      void qc.invalidateQueries({ queryKey: ["portal-messages", id] });
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Send failed"),
   });
@@ -34,7 +42,7 @@ export default function PortalMessagesPage({ params }: { params: { id: string } 
         <PageHeader title="Messages" />
         <Card>
           <CardContent className="grid gap-2">
-            <Textarea aria-label="Message" value={text} onChange={(e) => setText(e.target.value)} placeholder="Write to your agency…" />
+            <Textarea aria-label="Message" value={text} onChange={(e) => { seq.current++; setText(e.target.value); }} placeholder="Write to your agency…" />
             <div><Button disabled={!text.trim() || send.isPending} onClick={() => send.mutate()}>Send</Button></div>
           </CardContent>
         </Card>

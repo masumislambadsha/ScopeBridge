@@ -37,7 +37,7 @@ describe("fuzz: invalid bodies never crash the server", () => {
       ["post", "/api/files"], ["get", "/api/files"],
       ["post", "/api/requirements"], ["get", "/api/requirements"], ["get", `/api/requirements/${FAKE_ID}`],
       ["patch", `/api/requirements/${FAKE_ID}`], ["delete", `/api/requirements/${FAKE_ID}`],
-      ["post", "/api/requirements/analyze-readiness"], ["post", "/api/scopes"], ["get", "/api/scopes"],
+      ["post", "/api/scopes"], ["get", "/api/scopes"],
       ["get", `/api/scopes/${FAKE_ID}`],
       ["post", `/api/scopes/${FAKE_ID}/versions`], ["get", `/api/scopes/${FAKE_ID}/versions`],
       ["get", `/api/scope-versions/${FAKE_ID}`], ["patch", `/api/scope-versions/${FAKE_ID}`],

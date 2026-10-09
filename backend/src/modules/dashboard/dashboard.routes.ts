@@ -7,10 +7,10 @@ import * as C from "./dashboard.controller";
 import { analyticsQuerySchema } from "./dashboard.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 r.get(
   "/dashboard/analytics",
+  requireAuth,
   validate(analyticsQuerySchema, "query"),
   requireWorkspaceAccess("dashboard.view", (req) => (req.query as { workspaceId?: string }).workspaceId),
   ah(C.get),

@@ -6,6 +6,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
+import { useWorkspace } from "@/lib/workspace";
 import { AgencyShell } from "@/components/shells/agency-shell";
 import { AgencyGuard } from "@/components/shells/guards";
 import { Button } from "@/components/ui/button";
@@ -18,6 +20,8 @@ const schema = z.object({ name: z.string().min(1, "Name required"), description:
 
 export default function WorkspacesPage() {
   const qc = useQueryClient();
+  const { reload } = useAuth();
+  const { setWorkspaceId } = useWorkspace();
   const [page, setPage] = useState(1);
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["workspaces", page],
@@ -25,10 +29,13 @@ export default function WorkspacesPage() {
   });
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) });
   const create = useMutation({
-    mutationFn: (v: z.infer<typeof schema>) => api.post("/api/workspaces", v),
-    onSuccess: () => {
+    mutationFn: (v: z.infer<typeof schema>) => api.post<{ id: string }>("/api/workspaces", v),
+    onSuccess: async (r) => {
       toast.success("Workspace created");
       form.reset();
+      // Memberships changed: refresh the session, then select the new workspace.
+      await reload();
+      setWorkspaceId(r.data.id);
       void qc.invalidateQueries({ queryKey: ["workspaces"] });
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Create failed"),

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { datetimeOptional } from "../../core/zod";
 
 export const createMessageSchema = z.object({
   projectId: z.string().min(1),
@@ -10,5 +11,5 @@ export const messagesQuerySchema = z.object({
   page: z.coerce.number().int().min(1).default(1),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   projectId: z.string().min(1),
-  before: z.string().datetime().optional(),
+  before: datetimeOptional,
 });

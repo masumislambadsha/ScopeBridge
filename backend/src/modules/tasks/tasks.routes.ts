@@ -12,7 +12,6 @@ import {
 import { paginationSchema } from "../auth/auth.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 async function taskProject(req: Request): Promise<string | null> {
   const t = await prisma.task.findUnique({ where: { id: req.params.id }, select: { projectId: true } });
@@ -28,21 +27,23 @@ const NT = "Task not found";
 const fromBody = requireProjectAccess("dashboard.view", (req) => (req.body as { projectId?: string }).projectId);
 const one = requireEntityAccess("dashboard.view", taskProject, undefined, NT);
 
-r.post("/tasks", validate(createTaskSchema), fromBody, ah(C.create));
-r.get("/tasks", validate(tasksQuerySchema, "query"), attachMembership, ah(C.list));
-r.get("/tasks/mine", validate(paginationSchema, "query"), attachMembership, ah(C.mine));
-r.get("/tasks/:id", validate(taskIdParam, "params"), one, ah(C.get));
-r.patch("/tasks/:id", validateAll({ params: taskIdParam, body: patchTaskSchema }), one, ah(C.patch));
-r.delete("/tasks/:id", validate(taskIdParam, "params"), one, ah(C.remove));
+r.post("/tasks", requireAuth, validate(createTaskSchema), fromBody, ah(C.create));
+r.get("/tasks", requireAuth, validate(tasksQuerySchema, "query"), attachMembership, ah(C.list));
+r.get("/tasks/mine", requireAuth, validate(paginationSchema, "query"), attachMembership, ah(C.mine));
+r.get("/tasks/:id", requireAuth, validate(taskIdParam, "params"), one, ah(C.get));
+r.patch("/tasks/:id", requireAuth, validateAll({ params: taskIdParam, body: patchTaskSchema }), one, ah(C.patch));
+r.delete("/tasks/:id", requireAuth, validate(taskIdParam, "params"), one, ah(C.remove));
 
 r.get(
   "/scope-versions/:id/generate-tasks",
+  requireAuth,
   validateAll({ params: taskIdParam, query: generateTasksSchema }),
   requireEntityAccess("dashboard.view", versionProject, undefined, "Scope version not found"),
   ah(C.generate),
 );
 r.post(
   "/projects/:projectId/tasks/bulk",
+  requireAuth,
   validate(bulkTasksSchema),
   requireProjectAccess("dashboard.view", (req) => req.params.projectId),
   ah(C.bulk),

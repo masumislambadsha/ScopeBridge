@@ -12,7 +12,6 @@ import {
 } from "./requirements.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 async function requirementProject(req: Request): Promise<string | null> {
   const row = await prisma.requirement.findUnique({ where: { id: req.params.id }, select: { projectId: true } });
@@ -25,15 +24,16 @@ const fromQuery = requireProjectAccess("dashboard.view", (req) => (req.query as 
 const one = (perm: "dashboard.view" | "requirement.crud" | "requirement.approve") =>
   requireEntityAccess(perm, requirementProject, undefined, NF);
 
-r.post("/requirements", validate(createRequirementSchema), fromBody, ah(C.create));
-r.get("/requirements", validate(requirementsQuerySchema, "query"), fromQuery, ah(C.list));
-r.get("/requirements/:id", validate(requirementIdParam, "params"), one("dashboard.view"), ah(C.get));
-r.patch("/requirements/:id", validateAll({ params: requirementIdParam, body: patchRequirementSchema }), one("requirement.crud"), ah(C.patch));
-r.delete("/requirements/:id", validate(requirementIdParam, "params"), one("requirement.crud"), ah(C.remove));
-r.post("/requirements/:id/approve", validate(requirementIdParam, "params"), one("requirement.approve"), ah(C.approve));
-r.post("/requirements/mark", validate(markSchema), fromBody, ah(C.mark));
+r.post("/requirements", requireAuth, validate(createRequirementSchema), fromBody, ah(C.create));
+r.get("/requirements", requireAuth, validate(requirementsQuerySchema, "query"), fromQuery, ah(C.list));
+r.get("/requirements/:id", requireAuth, validate(requirementIdParam, "params"), one("dashboard.view"), ah(C.get));
+r.patch("/requirements/:id", requireAuth, validateAll({ params: requirementIdParam, body: patchRequirementSchema }), one("requirement.crud"), ah(C.patch));
+r.delete("/requirements/:id", requireAuth, validate(requirementIdParam, "params"), one("requirement.crud"), ah(C.remove));
+r.post("/requirements/:id/approve", requireAuth, validate(requirementIdParam, "params"), one("requirement.approve"), ah(C.approve));
+r.post("/requirements/mark", requireAuth, validate(markSchema), fromBody, ah(C.mark));
 r.get(
   "/projects/:projectId/readiness",
+  requireAuth,
   validate(z.object({ projectId: z.string().min(1) }), "params"),
   requireProjectAccess("dashboard.view", (req) => req.params.projectId),
   ah(C.readiness),

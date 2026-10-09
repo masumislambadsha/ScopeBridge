@@ -1,7 +1,7 @@
 import { prisma } from "../../lib/prisma";
-import { forbidden, notFound } from "../../core/http";
-import { Access } from "../../middleware/access";
+import { notFound, forbidden } from "../../core/http";
 import { projectDTO, requirementDTO, scopeVersionDTO, approvalDTO, taskProgressDTO, messageDTO, senderDTO, changeRequestDTO } from "../../core/dto";
+import { getProjectAccess, type Access } from "../../middleware/access";
 
 async function taskProgress(projectId: string) {
   const [total, completed] = await Promise.all([
@@ -58,6 +58,12 @@ export async function portalProject(userId: string, projectId: string) {
     messages: project.messages.map((m) => messageDTO({ ...m, sender: senderDTO(m.sender as unknown as Record<string, unknown>) })),
     changeRequests: project.changeRequests.map((c) => changeRequestDTO(c as unknown as Record<string, unknown>)),
   };
+}
+
+export async function resolvePortalAccess(userId: string): Promise<Access> {
+  const client = await prisma.client.findFirst({ where: { portalUserId: userId } });
+  if (!client) throw forbidden("Portal access only");
+  return { kind: "CLIENT", userId, workspaceId: client.workspaceId, clientId: client.id };
 }
 
 export function assertPortal(access: Access) {

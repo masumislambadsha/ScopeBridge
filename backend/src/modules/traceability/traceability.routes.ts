@@ -7,10 +7,10 @@ import { requireProjectAccess } from "../../middleware/access";
 import * as C from "./traceability.controller";
 
 const r = Router();
-r.use(requireAuth);
 
 r.get(
   "/projects/:id/traceability",
+  requireAuth,
   validate(z.object({ id: z.string().min(1) }), "params"),
   requireProjectAccess("dashboard.view", (req) => req.params.id),
   ah(C.get),

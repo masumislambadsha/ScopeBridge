@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { datetimeNullableOptional, datetimeOptional } from "../../core/zod";
 
 const questionSchema = z.object({
   id: z.string().min(1),
@@ -14,14 +15,14 @@ export const createIRSchema = z.object({
   title: z.string().min(1).max(200),
   description: z.string().max(4000).optional(),
   questions: z.array(questionSchema).min(1),
-  deadline: z.string().datetime().optional(),
+  deadline: datetimeOptional,
 });
 
 export const patchIRSchema = z.object({
   title: z.string().min(1).max(200).optional(),
   description: z.string().max(4000).nullable().optional(),
   questions: z.array(questionSchema).min(1).optional(),
-  deadline: z.string().datetime().nullable().optional(),
+  deadline: datetimeNullableOptional,
   status: z.enum(["DRAFT", "CLOSED"]).optional(),
 });
 
@@ -38,5 +39,5 @@ export const clarifySchema = z.object({
   projectId: z.string().min(1),
   requirementIds: z.array(z.string().min(1)).min(1).max(50),
   questions: z.array(questionSchema).min(1),
-  deadline: z.string().datetime().optional(),
+  deadline: datetimeOptional,
 });

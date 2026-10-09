@@ -13,10 +13,33 @@ export class ApiError extends Error {
 }
 
 let accessToken: string | null = null;
+const MEM_KEY = "sb_at";
+
+function readStored(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage.getItem(MEM_KEY);
+  } catch {
+    return null;
+  }
+}
+
+/** Access token lives in memory, mirrored to tab-scoped sessionStorage so full
+ * page reloads don't force a refresh roundtrip (D-17). Cleared on logout and
+ * on final 401. Never localStorage. */
 export function setAccessToken(t: string | null) {
   accessToken = t;
+  if (typeof window !== "undefined") {
+    try {
+      if (t) window.sessionStorage.setItem(MEM_KEY, t);
+      else window.sessionStorage.removeItem(MEM_KEY);
+    } catch {
+      /* ignore */
+    }
+  }
 }
 export function getAccessToken() {
+  if (!accessToken) accessToken = readStored();
   return accessToken;
 }
 
@@ -39,16 +62,20 @@ async function raw(path: string, opts: RequestInit = {}) {
 async function req<T>(path: string, opts: RequestInit = {}, retried = false): Promise<{ data: T; meta?: { page: number; limit: number; total: number; totalPages: number; unreadCount?: number } }> {
   const res = await raw(path, opts);
   if (res.status === 401 && !retried && !path.includes("/api/auth/")) {
-    // Refresh once (first-party cookie) and retry.
-    const r = await raw("/api/auth/refresh", { method: "POST" });
-    if (r.ok) {
-      const j = await r.json().catch(() => null);
-      const next = j?.data?.accessToken as string | undefined;
-      if (next) {
-        accessToken = next;
-        return req(path, opts, true);
+    // Refresh once (first-party cookie) and retry. Single-flight so concurrent
+    // 401s don't race the single-use refresh token.
+    const next = await sharedRefresh();
+    if (next) {
+      accessToken = next;
+      try {
+        if (typeof window !== "undefined") window.sessionStorage.setItem(MEM_KEY, next);
+      } catch {
+        /* ignore */
       }
+      return req(path, opts, true);
     }
+    // Refresh failed: drop the dead token so we don't keep retrying with it.
+    setAccessToken(null);
   }
   const json = await res.json().catch(() => null);
   if (!res.ok || !json?.success) {
@@ -56,6 +83,33 @@ async function req<T>(path: string, opts: RequestInit = {}, retried = false): Pr
     throw new ApiError(res.status, e.code ?? "INTERNAL", e.message ?? `Request failed (${res.status})`, e.details);
   }
   return json;
+}
+
+let refreshPromise: Promise<string | null> | null = null;
+
+function sharedRefresh(): Promise<string | null> {
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      try {
+        const r = await raw("/api/auth/refresh", { method: "POST" });
+        if (!r.ok) return null;
+        const j = await r.json().catch(() => null);
+        return (j?.data?.accessToken as string | undefined) ?? null;
+      } catch {
+        return null;
+      } finally {
+        refreshPromise = null;
+      }
+    })();
+  }
+  return refreshPromise;
+}
+
+/** Restore the session on app load. Single-flight with request-triggered refreshes. */
+export async function restoreSession(): Promise<string | null> {
+  const next = await sharedRefresh();
+  if (next) accessToken = next;
+  return next;
 }
 
 export const api = {

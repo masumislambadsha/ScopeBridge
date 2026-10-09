@@ -29,6 +29,11 @@ export function ChangeRequestsTab({ projectId }: { projectId: string }) {
     queryKey: ["change-request", selected?.id],
     queryFn: () => api.get<any>(`/api/change-requests/${selected.id}`).then((r) => r.data),
     enabled: !!selected,
+    // While AI analysis is pending, keep polling so the badge appears without reopening.
+    refetchInterval: (query) => {
+      const d = query.state.data as { aiClassification?: string | null } | undefined;
+      return selected && !d?.aiClassification ? 4000 : false;
+    },
   });
 
   const inv = () => {
