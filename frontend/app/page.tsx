@@ -11,6 +11,7 @@ import { SpotlightCard } from "@/components/spotlight-card";
 import { BlurFade } from "@/components/magicui/blur-fade";
 import { Marquee } from "@/components/magicui/marquee";
 import { NumberTicker } from "@/components/magicui/number-ticker";
+import { Pricing } from "@/components/ui/pricing";
 
 const STEPS = [
   { icon: Inbox, title: "Capture intake", body: "Information requests, submissions and files flow into one project inbox. Nothing lives in email threads." },
@@ -277,46 +278,12 @@ export default function Landing() {
 
       {/* ---------- PRICING ---------- */}
       <section id="pricing" className="mx-auto max-w-[1320px] scroll-mt-28 px-6 pb-20 md:px-10 md:pb-28">
-        <div className="text-center">
-          <BlurFade inView>
-            <Eyebrow className="justify-center">Pricing</Eyebrow>
-          </BlurFade>
-          <RevealText
-            className="section-title mx-auto mt-4"
-            pre="One lost scope pays for"
-            accent="a year"
-            post="of ScopeBridge."
+        <BlurFade inView>
+          <Pricing
+            title="One lost scope pays for a year of ScopeBridge"
+            description="Start monthly, switch to annual and save 20%. Cancel any time — your data is yours."
           />
-        </div>
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
-          {[
-            ["Starter", "$29", "For solo freelancers", ["3 active projects", "Client portal + signatures", "AI checklists"], false],
-            ["Studio", "$79", "For growing agencies", ["Unlimited projects", "Change-request firewall", "Traceability + audit log", "Task boards"], true],
-            ["Scale", "Custom", "For multi-team shops", ["SSO & roles", "Priority support", "Migration help"], false],
-          ].map(([name, price, hint, perks, featured]) => (
-            <BlurFade inView delay={0.1} key={name as string}>
-              <SpotlightCard
-                glow={featured ? "rgba(255,255,255,0.07)" : "rgba(74,124,116,0.12)"}
-                size={200}
-                className={`h-full rounded-[2rem] border p-8 ${featured ? "border-sage-600 bg-ink text-warm-50 shadow-soft" : "border-warm-200/70 bg-white shadow-card"}`}
-              >
-                <p className={`font-serif text-xl ${featured ? "text-warm-50" : "text-ink"}`}>{name as string}</p>
-                <p className="mt-2 font-serif text-4xl">{price as string}</p>
-                <p className={`mt-1 text-sm ${featured ? "text-warm-400" : "text-warm-500"}`}>{hint as string}</p>
-                <ul className="mt-5 grid gap-2 text-[15px]">
-                  {(perks as string[]).map((p) => (
-                    <li key={p} className="flex items-center gap-2">
-                      <CheckCircle2 size={16} className={featured ? "text-teal-400" : "text-sage-600"} /> {p}
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/register" className={`mt-6 block rounded-full py-3 text-center font-semibold transition-transform hover:scale-[1.01] active:scale-[0.99] ${featured ? "bg-warm-50 text-ink" : "bg-ink text-warm-50"}`}>
-                  Get started
-                </Link>
-              </SpotlightCard>
-            </BlurFade>
-          ))}
-        </div>
+        </BlurFade>
 
         <BlurFade inView>
           <div className="mt-16 rounded-[2.5rem] border border-warm-200/70 bg-white p-8 text-center shadow-card md:p-14 dark:bg-[#161310]">
