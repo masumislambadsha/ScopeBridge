@@ -1,13 +1,18 @@
-import { Request, Response, NextFunction } from 'express';
-import { env } from '../config/env';
+import { Request, Response, NextFunction } from "express";
+import { failBody } from "../core/http";
+import { toAppError } from "../core/errors";
+import { logger } from "../core/logger";
+import { env } from "../config/env";
 
-export function errorHandler(err: any, _req: Request, res: Response, _next: NextFunction) {
-  const status = err?.status ?? err?.statusCode ?? 500;
-  const message = status === 500 ? 'Internal server error' : (err?.message ?? 'Request failed');
-  if (!env.isProd) console.error(err);
-  res.status(status).json({ error: err?.name ?? 'Error', message });
+/** Central error handler → spec §3.2 envelope. Never leaks internals on 500. */
+export function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFunction) {
+  const appErr = toAppError(err);
+  if (appErr.status >= 500) {
+    logger.error("unhandled error", env.isProd ? undefined : { err: String((err as Error)?.stack ?? err) });
+  }
+  res.status(appErr.status).json(failBody(appErr.code, appErr.message, appErr.details));
 }
 
 export function notFound(_req: Request, res: Response) {
-  res.status(404).json({ error: 'NotFound', message: 'Route not found' });
+  res.status(404).json(failBody("NOT_FOUND", "Route not found"));
 }
