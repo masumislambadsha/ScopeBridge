@@ -1,8 +1,29 @@
 "use client";
 
-// Smooth scroll is handled natively via `scroll-behavior: smooth` in globals.css.
-// Kept as a component so public pages mirror the care-io SiteShell structure;
-// if `lenis` is added later, wire it up here.
-export function SmoothScroll() {
+import { useEffect } from "react";
+import Lenis from "lenis";
+
+export default function SmoothScroll() {
+  useEffect(() => {
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+    });
+
+    let raf = 0;
+    function loop(time: number) {
+      lenis.raf(time);
+      raf = requestAnimationFrame(loop);
+    }
+
+    raf = requestAnimationFrame(loop);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      lenis.destroy();
+    };
+  }, []);
+
   return null;
 }

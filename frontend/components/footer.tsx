@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion } from "motion/react";
 import { ArrowRight, ArrowUp, HeartHandshake } from "lucide-react";
 
 export function Footer({ variant = "full" }: { variant?: "full" | "simple" }) {
@@ -84,15 +85,21 @@ export function Footer({ variant = "full" }: { variant?: "full" | "simple" }) {
         </div>
       </div>
 
-      {showTop && (
-        <button
-          aria-label="Back to top"
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-warm-50 text-ink shadow-xl transition-transform hover:scale-105"
-        >
-          <ArrowUp size={18} />
-        </button>
-      )}
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            key="back-to-top"
+            aria-label="Back to top"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 16 }}
+            className="fixed bottom-6 right-6 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-warm-50 text-ink shadow-xl transition-transform hover:scale-105"
+          >
+            <ArrowUp size={18} />
+          </motion.button>
+        )}
+      </AnimatePresence>
     </footer>
   );
 }

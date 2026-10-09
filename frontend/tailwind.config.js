@@ -71,7 +71,14 @@ module.exports = {
         "scale-in": { from: { opacity: "0", transform: "scale(0.95)" }, to: { opacity: "1", transform: "scale(1)" } },
         float: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-10px)" } },
         marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(calc(-50% - var(--gap,2rem)))" } },
+        "marquee-vertical": { from: { transform: "translateY(0)" }, to: { transform: "translateY(calc(-50% - var(--gap,1rem)))" } },
         gradient: { "0%,100%": { backgroundPosition: "0% 50%" }, "50%": { backgroundPosition: "100% 50%" } },
+        "move-up-alternate": {
+          "0%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(80%)" },
+          "51%": { transform: "translateY(-80%)" },
+          to: { transform: "translateY(0)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.6s ease both",
@@ -79,7 +86,9 @@ module.exports = {
         "scale-in": "scale-in 0.4s ease both",
         float: "float 4s ease-in-out infinite",
         marquee: "marquee var(--duration,40s) linear infinite",
+        "marquee-vertical": "marquee-vertical var(--duration,40s) linear infinite",
         gradient: "gradient 8s ease infinite",
+        "move-up-alternate": "move-up-alternate 0.3s forwards",
       },
       maxWidth: {
         shell: "1320px",

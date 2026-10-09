@@ -47,7 +47,7 @@ export default function DashboardPage() {
         {workspaceId && data && data.scope === "workspace" && (
           <div className="grid gap-4">
             {/* Hero */}
-            <BlurFade>
+            <BlurFade inView>
               <div className="relative overflow-hidden rounded-[2rem] bg-ink p-8 text-warm-50 md:p-10">
                 <div className="bg-dot-pattern absolute inset-0 opacity-[0.07]" aria-hidden />
                 <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-sage-600/20 blur-[120px]" aria-hidden />
@@ -75,7 +75,7 @@ export default function DashboardPage() {
                 ["Pending approvals", data.totals.pendingApprovals, "need signatures", "bg-amber-50 text-amber-800"],
                 ["Open change requests", data.totals.pendingChangeRequests, `approved ${data.totals.approvedChanges} · rejected ${data.totals.rejectedChanges}`, "bg-orange-50 text-orange-800"],
               ].map(([label, value, sub, tint]) => (
-                <BlurFade key={label as string}>
+                <BlurFade inView key={label as string}>
                   <Card>
                     <CardHeader><CardTitle>{label as string}</CardTitle></CardHeader>
                     <CardContent>

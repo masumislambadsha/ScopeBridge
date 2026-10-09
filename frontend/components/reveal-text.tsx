@@ -1,56 +1,46 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+
+import { useRef } from "react";
+import { motion, useInView } from "motion/react";
 import { cn } from "@/lib/utils";
 
-interface RevealTextProps {
+export function RevealText({
+  pre = "",
+  accent = "",
+  post = "",
+  className = "",
+  delay = 0,
+}: {
   pre?: string;
   accent?: string;
   post?: string;
-  delay?: number;
   className?: string;
-}
-
-export function RevealText({ pre = "", accent = "", post = "", delay = 0, className }: RevealTextProps) {
+  delay?: number;
+}) {
   const ref = useRef<HTMLSpanElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisible(true);
-          obs.disconnect();
-        }
-      },
-      { rootMargin: "-40px" },
-    );
-    obs.observe(el);
-    return () => obs.disconnect();
-  }, []);
-
-  const words = (t: string) => (t ? t.split(" ") : []);
-  let i = 0;
-
-  const render = (list: string[], accentWord = false) =>
-    list.map((w) => {
-      const idx = i++;
-      return (
-        <span key={idx} className="reveal-mask">
-          <span className={cn("reveal-word", accentWord && "accent-word")} style={{ transitionDelay: `${delay + idx * 0.05}s` }}>
-            {w}
-            {`\u00A0`}
-          </span>
-        </span>
-      );
-    });
-
+  const inView = useInView(ref, { once: true, margin: "0px 0px -40px 0px" });
+  const words = (pre + " ").split(" ").filter(Boolean);
+  const accentWords = accent.split(" ").filter(Boolean);
+  const postWords = (post ? " " + post : "").split(" ").filter(Boolean);
+  const all: { word: string; isAccent: boolean }[] = [
+    ...words.map((w) => ({ word: w, isAccent: false })),
+    ...accentWords.map((w) => ({ word: w, isAccent: true })),
+    ...postWords.map((w) => ({ word: w, isAccent: false })),
+  ];
   return (
-    <span ref={ref} className={cn(visible && "reveal-visible", className)}>
-      {render(words(pre))}
-      {render(words(accent), true)}
-      {render(words(post))}
+    <span ref={ref} className={cn("block", className)}>
+      {all.map(({ word, isAccent }, i) => (
+        <span key={i} className="inline-block overflow-hidden align-top pb-[0.08em] -mb-[0.08em]">
+          <motion.span
+            className={cn("inline-block", isAccent && "italic text-sage-600")}
+            initial={{ y: "112%" }}
+            animate={inView ? { y: 0 } : { y: "112%" }}
+            transition={{ duration: 0.7, delay: delay + i * 0.05, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {word}&nbsp;
+          </motion.span>
+        </span>
+      ))}
     </span>
   );
 }

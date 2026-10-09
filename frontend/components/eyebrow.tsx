@@ -1,17 +1,26 @@
+import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-export function Eyebrow({ children, dark = false, className }: { children: React.ReactNode; dark?: boolean; className?: string }) {
+export function Eyebrow({
+  children,
+  dark = false,
+  className = "",
+}: {
+  children: ReactNode;
+  dark?: boolean;
+  className?: string;
+}) {
   return (
     <p
       className={cn(
-        "flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em]",
+        "text-xs tracking-[0.2em] uppercase font-medium mb-6 inline-flex items-center gap-3",
         dark ? "text-sage-300" : "text-sage-500",
         className,
       )}
     >
-      <span aria-hidden className={cn("h-px w-8", dark ? "bg-sage-300" : "bg-sage-500")} />
+      <span className={cn("h-px w-8", dark ? "bg-sage-300/60" : "bg-sage-500/60")} />
       {children}
-      <span aria-hidden className={cn("h-px w-8", dark ? "bg-sage-300" : "bg-sage-500")} />
+      <span className={cn("h-px w-8", dark ? "bg-sage-300/60" : "bg-sage-500/60")} />
     </p>
   );
 }

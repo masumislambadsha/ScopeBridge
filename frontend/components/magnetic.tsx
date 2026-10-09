@@ -1,36 +1,38 @@
 "use client";
-import { useRef, useState } from "react";
+
+import { useRef, type ReactNode } from "react";
+import { motion, useMotionValue, useSpring } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export function Magnetic({
   children,
+  className = "",
   strength = 0.25,
-  className,
 }: {
-  children: React.ReactNode;
-  strength?: number;
+  children: ReactNode;
   className?: string;
+  strength?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 150, damping: 15, mass: 0.1 });
+  const sy = useSpring(y, { stiffness: 150, damping: 15, mass: 0.1 });
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={cn("inline-block", className)}
-      style={{ transform: `translate(${offset.x}px, ${offset.y}px)`, transition: "transform 0.2s ease-out" }}
+      style={{ x: sx, y: sy }}
       onMouseMove={(e) => {
-        const el = ref.current;
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        setOffset({
-          x: (e.clientX - (r.left + r.width / 2)) * strength,
-          y: (e.clientY - (r.top + r.height / 2)) * strength,
-        });
+        const rect = ref.current?.getBoundingClientRect();
+        if (!rect) return;
+        x.set((e.clientX - rect.left - rect.width / 2) * strength);
+        y.set((e.clientY - rect.top - rect.height / 2) * strength);
       }}
-      onMouseLeave={() => setOffset({ x: 0, y: 0 })}
+      onMouseLeave={() => { x.set(0); y.set(0); }}
+      className={cn("inline-block", className)}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }

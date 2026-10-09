@@ -1,43 +1,48 @@
 "use client";
-import { useRef, useState } from "react";
+
+import { useRef, type ReactNode } from "react";
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from "motion/react";
 import { cn } from "@/lib/utils";
 
 export function TiltCard({
   children,
+  className = "",
   max = 6,
-  className,
 }: {
-  children: React.ReactNode;
-  max?: number;
+  children: ReactNode;
   className?: string;
+  max?: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const [t, setT] = useState({ rx: 0, ry: 0 });
+  const px = useMotionValue(0.5);
+  const py = useMotionValue(0.5);
+  const sx = useSpring(px, { stiffness: 180, damping: 18, mass: 0.4 });
+  const sy = useSpring(py, { stiffness: 180, damping: 18, mass: 0.4 });
+  const rotateX = useTransform(sy, [0, 1], [max, -max]);
+  const rotateY = useTransform(sx, [0, 1], [-max, max]);
+  const glareX = useTransform(sx, [0, 1], ["0%", "100%"]);
+  const glareY = useTransform(sy, [0, 1], ["0%", "100%"]);
+  const glare = useMotionTemplate`radial-gradient(420px circle at ${glareX} ${glareY}, rgba(255,255,255,0.3), transparent 65%)`;
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={cn(className)}
-      style={{ perspective: 1000 }}
+      style={{ rotateX, rotateY, transformPerspective: 1000, transformStyle: "preserve-3d" }}
       onMouseMove={(e) => {
-        const el = ref.current;
-        if (!el) return;
-        const r = el.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width - 0.5;
-        const py = (e.clientY - r.top) / r.height - 0.5;
-        setT({ rx: -py * max * 2, ry: px * max * 2 });
+        const rect = ref.current?.getBoundingClientRect();
+        if (!rect) return;
+        px.set((e.clientX - rect.left) / rect.width);
+        py.set((e.clientY - rect.top) / rect.height);
       }}
-      onMouseLeave={() => setT({ rx: 0, ry: 0 })}
+      onMouseLeave={() => { px.set(0.5); py.set(0.5); }}
+      className={cn("group relative", className)}
     >
-      <div
-        style={{
-          transform: `rotateX(${t.rx}deg) rotateY(${t.ry}deg)`,
-          transition: "transform 0.3s ease-out",
-          transformStyle: "preserve-3d",
-        }}
-      >
-        {children}
-      </div>
-    </div>
+      {children}
+      <motion.div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20"
+        style={{ background: glare }}
+      />
+    </motion.div>
   );
 }
