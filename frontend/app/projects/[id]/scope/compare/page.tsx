@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { use, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { AgencyShell } from "@/components/shells/agency-shell";
@@ -9,12 +9,13 @@ import { Select } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/layout";
 import { ListSkeleton, ErrorState } from "@/components/ui/states";
 
-export default function ScopeComparePage({ params }: { params: { id: string } }) {
+export default function ScopeComparePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [from, setFrom] = useState("");
   const [to, setTo] = useState("");
   const scopes = useQuery({
-    queryKey: ["scope", params.id, "compare"],
-    queryFn: () => api.get<any[]>(`/api/scopes?projectId=${params.id}`).then((r) => r.data[0] ?? null),
+    queryKey: ["scope", id, "compare"],
+    queryFn: () => api.get<any[]>(`/api/scopes?projectId=${id}`).then((r) => r.data[0] ?? null),
   });
   const versions = (scopes.data?.versions ?? []) as any[];
   const cmp = useQuery({

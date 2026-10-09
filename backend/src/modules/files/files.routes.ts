@@ -9,7 +9,6 @@ import * as C from "./files.controller";
 import { uploadFilesSchema, filesQuerySchema, fileIdParam } from "./files.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 async function fileProject(req: Request): Promise<string | null> {
   const f = await prisma.file.findUnique({ where: { id: req.params.id }, select: { projectId: true } });
@@ -18,6 +17,7 @@ async function fileProject(req: Request): Promise<string | null> {
 
 r.post(
   "/files",
+  requireAuth,
   uploadMany,
   validate(uploadFilesSchema),
   requireProjectAccess("submission.create", (req) => (req.body as { projectId?: string }).projectId),
@@ -25,12 +25,14 @@ r.post(
 );
 r.get(
   "/files",
+  requireAuth,
   validate(filesQuerySchema, "query"),
   requireProjectAccess("dashboard.view", (req) => (req.query as { projectId?: string }).projectId),
   ah(C.list),
 );
 r.get(
   "/files/:id/download",
+  requireAuth,
   validate(fileIdParam, "params"),
   requireEntityAccess("dashboard.view", fileProject, undefined, "File not found"),
   ah(C.download),

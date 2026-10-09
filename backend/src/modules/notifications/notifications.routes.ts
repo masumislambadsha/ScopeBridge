@@ -6,13 +6,13 @@ import * as C from "./notifications.controller";
 import { notificationsQuerySchema, notificationIdParam, activityQuerySchema } from "./notifications.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
-r.get("/notifications", validate(notificationsQuerySchema, "query"), ah(C.list));
-r.patch("/notifications/read-all", ah(C.markAllRead));
-r.patch("/notifications/:id/read", validate(notificationIdParam, "params"), ah(C.markRead));
+r.get("/notifications", requireAuth, validate(notificationsQuerySchema, "query"), ah(C.list));
+r.patch("/notifications/read-all", requireAuth, ah(C.markAllRead));
+r.patch("/notifications/:id/read", requireAuth, validate(notificationIdParam, "params"), ah(C.markRead));
 r.get(
   "/activity",
+  requireAuth,
   validate(activityQuerySchema, "query"),
   ah(C.resolveActivityAccess),
   ah(C.activity),

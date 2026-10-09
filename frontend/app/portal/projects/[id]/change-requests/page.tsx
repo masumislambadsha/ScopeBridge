@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -16,15 +17,16 @@ import { StatusBadge } from "@/components/ui/badge";
 
 const schema = z.object({ title: z.string().min(1, "Title required"), description: z.string().min(1, "Describe the change") });
 
-export default function PortalChangeRequestsPage({ params }: { params: { id: string } }) {
+export default function PortalChangeRequestsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const qc = useQueryClient();
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["portal-project", params.id, "crs"],
-    queryFn: () => api.get<any>(`/api/portal/projects/${params.id}`).then((r) => r.data),
+    queryKey: ["portal-project", id, "crs"],
+    queryFn: () => api.get<any>(`/api/portal/projects/${id}`).then((r) => r.data),
   });
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) });
   const create = useMutation({
-    mutationFn: (v: z.infer<typeof schema>) => api.post("/api/change-requests", { projectId: params.id, ...v }),
+    mutationFn: (v: z.infer<typeof schema>) => api.post("/api/change-requests", { projectId: id, ...v }),
     onSuccess: () => {
       toast.success("Change request submitted — your agency will review it");
       form.reset();

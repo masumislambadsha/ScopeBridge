@@ -4,6 +4,7 @@ import { register, inviteLinkTo } from './helpers';
 const stamp = Date.now().toString(36);
 
 test('client cannot see internal data or agency routes', async ({ browser }: { browser: Browser }) => {
+  test.slow(); // Mailpit polling + multi-context flows
   const pmCtx = await browser.newContext();
   const clientCtx = await browser.newContext();
   const anonCtx = await browser.newContext();
@@ -24,21 +25,24 @@ test('client cannot see internal data or agency routes', async ({ browser }: { b
   await pm.getByLabel('Name').fill('Neg Co');
   await pm.getByLabel('Email').fill(clientEmail);
   await pm.getByRole('button', { name: 'Add client' }).click();
-  await pm.getByText('Neg Co').click();
+  await pm.getByRole('link', { name: 'Neg Co' }).first().click();
   await pm.getByRole('button', { name: 'Invite to portal' }).click();
   await pm.goto('/projects/new');
   await pm.getByLabel('Client').selectOption('Neg Co');
   await pm.getByLabel('Name').fill('Neg Project');
   await pm.getByRole('button', { name: 'Create project' }).click();
+  // Wait for the detail page itself (not just /projects/* — "new" would match too).
+  await expect(pm.getByRole('tab', { name: 'Messages', exact: true })).toBeVisible({ timeout: 30000 });
   const projectId = pm.url().split('/projects/')[1].split(/[?#]/)[0];
-  await pm.getByRole('tab', { name: 'Messages' }).click();
+  await pm.getByRole('tab', { name: 'Messages', exact: true }).click();
   await pm.getByLabel('Message').fill('Secret internal note');
   await pm.getByLabel('Visibility').selectOption('INTERNAL');
   await pm.getByRole('button', { name: 'Send' }).click();
   await expect(pm.getByText('Secret internal note')).toBeVisible();
   await pm.getByLabel('Message').fill('Hello client');
+  await pm.getByLabel('Visibility').selectOption('CLIENT');
   await pm.getByRole('button', { name: 'Send' }).click();
-  await expect(pm.getByText('Hello client')).toBeVisible();
+  await expect(pm.getByText('Hello client').first()).toBeVisible();
 
   // Client with portal access.
   const token = await inviteLinkTo(clientEmail);

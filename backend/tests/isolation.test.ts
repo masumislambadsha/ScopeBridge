@@ -73,9 +73,9 @@ describe("workspace isolation", () => {
 
   it("second workspace cannot see first workspace's tasks without projectId", async () => {
     const o = authed(outsider.token);
+    // A user with no membership anywhere gets 404 (no scope to list).
     const r = await o.get("/api/tasks");
-    expect(r.status).toBe(200);
-    expect(r.body.data).toEqual([]);
+    expect(r.status).toBe(404);
     // And the insider's unscoped list contains no foreign rows.
     const pm = authed(a.pm.token);
     const mine = await pm.get("/api/tasks");

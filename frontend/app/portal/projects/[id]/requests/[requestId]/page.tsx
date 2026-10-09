@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { use, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api, ApiError, DIRECT_API, getAccessToken } from "@/lib/api";
@@ -11,22 +11,23 @@ import { Input, Label, Textarea, Select } from "@/components/ui/input";
 import { PageHeader } from "@/components/ui/layout";
 import { ListSkeleton, ErrorState } from "@/components/ui/states";
 
-export default function PortalAnswerPage({ params }: { params: { id: string; requestId: string } }) {
+export default function PortalAnswerPage({ params }: { params: Promise<{ id: string; requestId: string }> }) {
+  const { id: projectId, requestId } = use(params);
   const qc = useQueryClient();
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [extra, setExtra] = useState("");
   const [files, setFiles] = useState<File[]>([]);
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["portal-request", params.requestId],
-    queryFn: () => api.get<any>(`/api/information-requests/${params.requestId}`).then((r) => r.data),
+    queryKey: ["portal-request", requestId],
+    queryFn: () => api.get<any>(`/api/information-requests/${requestId}`).then((r) => r.data),
   });
 
   const submit = useMutation({
     mutationFn: async () => {
       const fd = new FormData();
-      fd.append("projectId", params.id);
-      fd.append("informationRequestId", params.requestId);
+      fd.append("projectId", projectId);
+      fd.append("informationRequestId", requestId);
       fd.append("answers", JSON.stringify(answers));
       if (extra.trim()) fd.append("additionalInfo", extra.trim());
       for (const f of files.slice(0, 10)) fd.append("files", f);
@@ -41,7 +42,7 @@ export default function PortalAnswerPage({ params }: { params: { id: string; req
     },
     onSuccess: () => {
       toast.success("Answers submitted — thank you");
-      void qc.invalidateQueries({ queryKey: ["portal-project", params.id] });
+      void qc.invalidateQueries({ queryKey: ["portal-project", projectId] });
       void qc.invalidateQueries({ queryKey: ["portal-projects"] });
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Submit failed"),

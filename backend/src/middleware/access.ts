@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../lib/prisma";
-import { amw, forbidden, notFound } from "../core/http";
+import { amw, badRequest, forbidden, notFound } from "../core/http";
 import { AuthedRequest } from "./auth";
 
 export type WorkspaceRole = "ADMIN" | "PROJECT_MANAGER" | "TEAM_MEMBER";
@@ -138,7 +138,7 @@ export interface AccessRequest extends AuthedRequest {
 export function requireProjectAccess(perm: Permission, getProjectId: (req: Request) => string | undefined, ctx?: (req: Request) => PermCtx | Promise<PermCtx>) {
   return amw(async (req: AccessRequest, _res: Response, next: NextFunction) => {
     const projectId = getProjectId(req);
-    if (!projectId) throw notFound("Project not found");
+    if (!projectId) throw badRequest("projectId is required");
     const access = await getProjectAccess(req.userId!, projectId);
     if (!access) throw notFound("Project not found");
     if (!can(access, perm, (await ctx?.(req)) ?? {})) {

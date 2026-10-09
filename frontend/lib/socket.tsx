@@ -14,9 +14,9 @@ const INVALIDATE: Record<string, string[][]> = {
   "submission:new": [["submissions"], ["information-requests"]],
   "requirement:updated": [["requirements"], ["readiness"], ["traceability"]],
   "scope:version:updated": [["scope"], ["scope-versions"], ["traceability"]],
-  "approval:updated": [["approvals"], ["scope-versions"], ["change-requests"], ["traceability"]],
+  "approval:updated": [["approvals"], ["scope"], ["scope-versions"], ["change-requests"], ["traceability"]],
   "task:updated": [["tasks"], ["my-tasks"], ["traceability"], ["dashboard"]],
-  "change-request:updated": [["change-requests"], ["traceability"]],
+  "change-request:updated": [["change-requests"], ["change-request"], ["traceability"]],
 };
 
 const Ctx = createContext<{ socket: Socket | null; joinedProject: string | null; joinProject: (id: string | null) => void }>({

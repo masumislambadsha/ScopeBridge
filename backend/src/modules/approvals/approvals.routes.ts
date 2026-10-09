@@ -12,7 +12,6 @@ import {
 } from "./approvals.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 async function approvalScope(req: Request): Promise<string | null> {
   const a = await prisma.approval.findUnique({ where: { id: req.params.id }, select: { scope: { select: { projectId: true } } } });
@@ -47,19 +46,21 @@ const oneDecide = requireEntityAccess("approval.decide", approvalScope, decideCt
 
 r.post(
   "/approvals",
+  requireAuth,
   validate(createApprovalSchema),
   requireEntityAccess("scope.send", versionProject, undefined, "Scope version not found"),
   ah(C.create),
 );
-r.get("/approvals", validate(approvalsQuerySchema, "query"), ah(C.list));
-r.get("/approvals/:id", validate(approvalIdParam, "params"), one("dashboard.view"), ah(C.get));
-r.post("/approvals/:id/approve", validateAll({ params: approvalIdParam, body: decideSchema }), oneDecide, ah(C.approve));
-r.post("/approvals/:id/reject", validateAll({ params: approvalIdParam, body: decideSchema }), oneDecide, ah(C.reject));
-r.post("/approvals/:id/request-changes", validateAll({ params: approvalIdParam, body: requestChangesSchema }), oneDecide, ah(C.requestChanges));
+r.get("/approvals", requireAuth, validate(approvalsQuerySchema, "query"), ah(C.list));
+r.get("/approvals/:id", requireAuth, validate(approvalIdParam, "params"), one("dashboard.view"), ah(C.get));
+r.post("/approvals/:id/approve", requireAuth, validateAll({ params: approvalIdParam, body: decideSchema }), oneDecide, ah(C.approve));
+r.post("/approvals/:id/reject", requireAuth, validateAll({ params: approvalIdParam, body: decideSchema }), oneDecide, ah(C.reject));
+r.post("/approvals/:id/request-changes", requireAuth, validateAll({ params: approvalIdParam, body: requestChangesSchema }), oneDecide, ah(C.requestChanges));
 
 // Required §7.1 path: sends the scope's open DRAFT (or body.scopeVersionId) for approval.
 r.post(
   "/scopes/:id/request-approval",
+  requireAuth,
   validateAll({ params: z.object({ id: z.string().min(1) }), body: z.object({ scopeVersionId: z.string().min(1).optional() }) }),
   requireEntityAccess("scope.send", scopeProject, undefined, "Scope not found"),
   ah(C.requestApprovalForScope),

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { datetimeNullableOptional, datetimeOptional } from "../../core/zod";
 import { paginationSchema } from "../auth/auth.schemas";
 
 export const createProjectSchema = z.object({
@@ -8,8 +9,8 @@ export const createProjectSchema = z.object({
   description: z.string().max(4000).optional(),
   projectType: z.enum(["E_COMMERCE", "SAAS", "MOBILE_APP", "WEBSITE", "CUSTOM"]).default("CUSTOM"),
   projectTypeLabel: z.string().max(120).optional(),
-  startDate: z.string().datetime().optional(),
-  deadline: z.string().datetime().optional(),
+  startDate: datetimeOptional,
+  deadline: datetimeOptional,
 });
 
 export const patchProjectSchema = z.object({
@@ -17,8 +18,8 @@ export const patchProjectSchema = z.object({
   description: z.string().max(4000).nullable().optional(),
   projectType: z.enum(["E_COMMERCE", "SAAS", "MOBILE_APP", "WEBSITE", "CUSTOM"]).optional(),
   projectTypeLabel: z.string().max(120).nullable().optional(),
-  startDate: z.string().datetime().nullable().optional(),
-  deadline: z.string().datetime().nullable().optional(),
+  startDate: datetimeNullableOptional,
+  deadline: datetimeNullableOptional,
   status: z.enum(["PLANNING", "ACTIVE", "ON_HOLD", "COMPLETED", "CANCELLED"]).optional(),
 });
 

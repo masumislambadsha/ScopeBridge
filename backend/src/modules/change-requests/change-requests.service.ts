@@ -8,6 +8,7 @@ import { assertMagic } from "../../middleware/upload";
 import { uploadFile, deleteFile } from "../../services/storage";
 import { filesQueue } from "../../queues/queues";
 import { withFeatureIds } from "../scopes/scopes.service";
+import { emitTeam } from "../../services/realtime";
 import { changeRequestDTO } from "../../core/dto";
 
 function pad(n: number) {
@@ -266,6 +267,7 @@ export async function approveCR(access: Access, actorId: string, id: string, inp
     return { row, version: updated, createdReqIds };
   });
   await audit({ workspaceId: access.workspaceId, projectId: project.id, actorId, action: "cr.version_proposed", entityType: "ChangeRequest", entityId: id, metadata: { version: out.version.version } });
+  await emitTeam(project.id, "scope:version:updated", { projectId: project.id, scopeVersionId: out.version.id });
   return out.row;
 }
 

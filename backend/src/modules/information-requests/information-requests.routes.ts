@@ -9,7 +9,6 @@ import * as C from "./information-requests.controller";
 import { createIRSchema, patchIRSchema, irQuerySchema, irIdParam, clarifySchema } from "./information-requests.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 async function irProject(req: Request): Promise<string | null> {
   const ir = await prisma.informationRequest.findUnique({ where: { id: req.params.id }, select: { projectId: true } });
@@ -21,11 +20,11 @@ const fromQuery = requireProjectAccess("dashboard.view", (req) => (req.query as 
 const one = (perm: "dashboard.view" | "ir.crud" | "ir.send") =>
   requireEntityAccess(perm, irProject, undefined, "Information request not found");
 
-r.post("/information-requests", validate(createIRSchema), fromBody, ah(C.create));
-r.get("/information-requests", validate(irQuerySchema, "query"), fromQuery, ah(C.list));
-r.get("/information-requests/:id", validate(irIdParam, "params"), one("dashboard.view"), ah(C.get));
-r.patch("/information-requests/:id", validateAll({ params: irIdParam, body: patchIRSchema }), one("ir.crud"), ah(C.patch));
-r.post("/information-requests/:id/send", validate(irIdParam, "params"), one("ir.send"), ah(C.send));
-r.post("/requirements/request-clarification", validate(clarifySchema), fromBody, ah(C.clarify));
+r.post("/information-requests", requireAuth, validate(createIRSchema), fromBody, ah(C.create));
+r.get("/information-requests", requireAuth, validate(irQuerySchema, "query"), fromQuery, ah(C.list));
+r.get("/information-requests/:id", requireAuth, validate(irIdParam, "params"), one("dashboard.view"), ah(C.get));
+r.patch("/information-requests/:id", requireAuth, validateAll({ params: irIdParam, body: patchIRSchema }), one("ir.crud"), ah(C.patch));
+r.post("/information-requests/:id/send", requireAuth, validate(irIdParam, "params"), one("ir.send"), ah(C.send));
+r.post("/requirements/request-clarification", requireAuth, validate(clarifySchema), fromBody, ah(C.clarify));
 
 export default r;

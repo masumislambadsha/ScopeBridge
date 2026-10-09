@@ -9,7 +9,6 @@ import * as C from "./submissions.controller";
 import { submissionsQuerySchema, submissionIdParam } from "./submissions.schemas";
 
 const r = Router();
-r.use(requireAuth);
 
 async function submissionProject(req: Request): Promise<string | null> {
   const s = await prisma.submission.findUnique({ where: { id: req.params.id }, select: { projectId: true } });
@@ -19,18 +18,21 @@ async function submissionProject(req: Request): Promise<string | null> {
 // Multipart goes DIRECTLY to the API (no Next.js proxy — body size limits, §3.3).
 r.post(
   "/submissions",
+  requireAuth,
   uploadMany,
   requireProjectAccess("submission.create", (req) => (req.body as { projectId?: string }).projectId),
   ah(C.create),
 );
 r.get(
   "/submissions",
+  requireAuth,
   validate(submissionsQuerySchema, "query"),
   requireProjectAccess("dashboard.view", (req) => (req.query as { projectId?: string }).projectId),
   ah(C.list),
 );
 r.get(
   "/submissions/:id",
+  requireAuth,
   validate(submissionIdParam, "params"),
   requireEntityAccess("dashboard.view", submissionProject, undefined, "Submission not found"),
   ah(C.get),

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
@@ -16,7 +16,8 @@ interface Preview {
   client: { id: string; name: string } | null;
 }
 
-export default function InvitePage({ params }: { params: { token: string } }) {
+export default function InvitePage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = use(params);
   const router = useRouter();
   const { session, reload } = useAuth();
   const [preview, setPreview] = useState<Preview | null>(null);
@@ -24,20 +25,20 @@ export default function InvitePage({ params }: { params: { token: string } }) {
 
   useEffect(() => {
     api
-      .get<Preview>(`/api/invitations/${params.token}`)
+      .get<Preview>(`/api/invitations/${token}`)
       .then((r) => setPreview(r.data))
       .catch((e) => setError(e instanceof ApiError ? e.message : "Invalid invitation"));
-  }, [params.token]);
+  }, [token]);
 
   async function accept() {
     try {
-      await api.post(`/api/invitations/${params.token}/accept`, {});
+      await api.post(`/api/invitations/${token}/accept`, {});
       toast.success("Invitation accepted");
       await reload();
       router.push(preview?.type === "CLIENT_PORTAL" ? "/portal" : "/dashboard");
     } catch {
       // New user: register with the invite token attached.
-      router.push(`/register?inviteToken=${params.token}`);
+      router.push(`/register?inviteToken=${token}`);
     }
   }
 
@@ -64,10 +65,10 @@ export default function InvitePage({ params }: { params: { token: string } }) {
                 <Button onClick={accept}>Accept invitation</Button>
               ) : (
                 <div className="flex gap-2">
-                  <Link href={`/register?inviteToken=${params.token}`} className="flex-1 rounded-md bg-zinc-900 px-4 py-2 text-center text-sm text-white">
+                  <Link href={`/register?inviteToken=${token}`} className="flex-1 rounded-md bg-zinc-900 px-4 py-2 text-center text-sm text-white">
                     Create account & accept
                   </Link>
-                  <Link href={`/login?inviteToken=${params.token}`} className="flex-1 rounded-md border px-4 py-2 text-center text-sm">
+                  <Link href={`/login?inviteToken=${token}`} className="flex-1 rounded-md border px-4 py-2 text-center text-sm">
                     Log in & accept
                   </Link>
                 </div>
