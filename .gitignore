@@ -16,3 +16,6 @@ backend/.uploads/
 # Local agent/tooling (neon skills, mcp)
 .agents/
 skills-lock.json
+
+# Vercel CLI
+.vercel
