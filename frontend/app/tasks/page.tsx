@@ -46,8 +46,8 @@ export default function MyTasksPage() {
               <Card key={t.id}>
                 <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-center">
                   <div className="flex-1">
-                    <p className="font-medium"><span className="font-mono text-xs text-zinc-500">{t.code}</span> {t.title}</p>
-                    <p className="text-xs text-zinc-500">{t.requirement ? `${t.requirement.code} · ` : ""}{t.priority}</p>
+                    <p className="font-medium"><span className="font-mono text-xs text-warm-500">{t.code}</span> {t.title}</p>
+                    <p className="text-xs text-warm-500">{t.requirement ? `${t.requirement.code} · ` : ""}{t.priority}</p>
                   </div>
                   <Select aria-label="Move task" value={t.status} onChange={(e) => move.mutate({ id: t.id, to: e.target.value })}>
                     <option value="TODO">Todo</option>

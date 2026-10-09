@@ -38,10 +38,10 @@ export function OverviewTab({ projectId }: { projectId: string }) {
           <ol className="flex flex-wrap items-center gap-1">
             {STAGES.map((s, i) => (
               <li key={s} className="flex items-center gap-1">
-                <span className={`rounded-full px-3 py-1 text-xs font-medium ${i <= stageIdx ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-500"}`}>
+                <span className={`rounded-full px-3 py-1 text-xs font-medium ${i <= stageIdx ? "bg-ink text-white" : "bg-warm-100 text-warm-500"}`}>
                   {STAGE_LABELS[s]}
                 </span>
-                {i < STAGES.length - 1 && <span className="text-zinc-300">→</span>}
+                {i < STAGES.length - 1 && <span className="text-warm-300">→</span>}
               </li>
             ))}
           </ol>
@@ -51,12 +51,12 @@ export function OverviewTab({ projectId }: { projectId: string }) {
         <Card>
           <CardHeader><CardTitle>Requirements ({data.requirements.length})</CardTitle></CardHeader>
           <CardContent>
-            {data.requirements.length === 0 && <p className="text-sm text-zinc-500">None yet — they appear after client submissions are analyzed.</p>}
+            {data.requirements.length === 0 && <p className="text-sm text-warm-500">None yet — they appear after client submissions are analyzed.</p>}
             <ul className="grid gap-1 text-sm">
               {data.requirements.map((r: any) => (
                 <li key={r.id}>
-                  <button className="w-full rounded-md p-1 text-left hover:bg-zinc-50" onClick={() => setSelectedReq(r.id)}>
-                    <span className="font-mono text-xs text-zinc-500">{r.code}</span> {r.title} <StatusBadge status={r.status} />
+                  <button className="w-full rounded-xl p-1 text-left hover:bg-sage-50/40" onClick={() => setSelectedReq(r.id)}>
+                    <span className="font-mono text-xs text-warm-500">{r.code}</span> {r.title} <StatusBadge status={r.status} />
                   </button>
                 </li>
               ))}
@@ -68,9 +68,9 @@ export function OverviewTab({ projectId }: { projectId: string }) {
           <CardContent className="grid gap-2 text-sm">
             <ul className="grid gap-1">
               {data.versions.map((v: any) => (
-                <li key={v.id}>v{v.version} <StatusBadge status={v.status} /> <span className="text-xs text-zinc-500">{v.requirementLinks?.length ?? 0} requirements</span></li>
+                <li key={v.id}>v{v.version} <StatusBadge status={v.status} /> <span className="text-xs text-warm-500">{v.requirementLinks?.length ?? 0} requirements</span></li>
               ))}
-              {data.versions.length === 0 && <li className="text-zinc-500">No scope yet.</li>}
+              {data.versions.length === 0 && <li className="text-warm-500">No scope yet.</li>}
             </ul>
             <ul className="grid gap-1">
               {data.changeRequests.map((c: any) => (

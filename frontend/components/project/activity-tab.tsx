@@ -35,10 +35,10 @@ export function ActivityTab({ projectId, workspaceId }: { projectId?: string; wo
       {data?.items.map((a: any) => (
         <Card key={a.id}>
           <CardContent className="text-sm">
-            <p><span className="font-mono text-xs font-medium">{a.action}</span> <span className="text-zinc-500">{a.entityType}{a.entityId ? ` ${String(a.entityId).slice(0, 8)}…` : ""}</span></p>
-            <p className="text-xs text-zinc-500">{a.actor?.name ?? a.actorType} · {format(new Date(a.createdAt), "MMM d, yyyy HH:mm")}</p>
+            <p><span className="font-mono text-xs font-medium">{a.action}</span> <span className="text-warm-500">{a.entityType}{a.entityId ? ` ${String(a.entityId).slice(0, 8)}…` : ""}</span></p>
+            <p className="text-xs text-warm-500">{a.actor?.name ?? a.actorType} · {format(new Date(a.createdAt), "MMM d, yyyy HH:mm")}</p>
             {a.metadata && Object.keys(a.metadata).length > 0 && (
-              <pre className="mt-1 overflow-auto rounded bg-zinc-50 p-1 text-xs">{JSON.stringify(a.metadata, null, 2)}</pre>
+              <pre className="mt-1 overflow-auto rounded bg-warm-50 p-1 text-xs">{JSON.stringify(a.metadata, null, 2)}</pre>
             )}
           </CardContent>
         </Card>
@@ -49,7 +49,7 @@ export function ActivityTab({ projectId, workspaceId }: { projectId?: string; wo
           <Button variant="outline" size="sm" disabled={page >= data.meta.totalPages} onClick={() => setPage(page + 1)}>Next</Button>
         </div>
       )}
-      <p className="text-xs text-zinc-500">Select filter: <Select aria-label="Quick filter" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }}><option value="">All actions</option><option value="scope.version.approved">Scope approvals</option><option value="task.status_changed">Task changes</option><option value="cr.submitted">Change requests</option><option value="ai.completed">AI runs</option></Select></p>
+      <p className="text-xs text-warm-500">Select filter: <Select aria-label="Quick filter" value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }}><option value="">All actions</option><option value="scope.version.approved">Scope approvals</option><option value="task.status_changed">Task changes</option><option value="cr.submitted">Change requests</option><option value="ai.completed">AI runs</option></Select></p>
     </div>
   );
 }

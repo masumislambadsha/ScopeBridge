@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuth } from "@/lib/auth";
 import { ApiError, fieldErrors } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input, Label, FieldError } from "@/components/ui/input";
+import { AuthShell } from "@/components/auth-shell";
 
 const schema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -30,29 +30,21 @@ export default function PortalLoginPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Client Portal</CardTitle>
-          <CardDescription>Review scopes, answer requests, track progress.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" {...form.register("email")} />
-              <FieldError message={form.formState.errors.email?.message} />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" {...form.register("password")} />
-              <FieldError message={form.formState.errors.password?.message} />
-            </div>
-            {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-            <Button type="submit" disabled={form.formState.isSubmitting}>Log in to portal</Button>
-          </form>
-        </CardContent>
-      </Card>
-    </main>
+    <AuthShell title="Client Portal" description="Review scopes, answer requests, track progress.">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" {...form.register("email")} />
+          <FieldError message={form.formState.errors.email?.message} />
+        </div>
+        <div>
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" {...form.register("password")} />
+          <FieldError message={form.formState.errors.password?.message} />
+        </div>
+        {serverError && <p className="text-sm font-medium text-red-600">{serverError}</p>}
+        <Button type="submit" size="pill" disabled={form.formState.isSubmitting}>Log in to portal</Button>
+      </form>
+    </AuthShell>
   );
 }

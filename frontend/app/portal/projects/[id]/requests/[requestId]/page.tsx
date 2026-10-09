@@ -71,7 +71,7 @@ export default function PortalAnswerPage({ params }: { params: Promise<{ id: str
                           {(q.options ?? []).map((o: string) => <option key={o} value={o}>{o}</option>)}
                         </Select>
                       ) : q.answerType === "file" ? (
-                        <p className="text-xs text-zinc-500">Attach files below for this question.</p>
+                        <p className="text-xs text-warm-500">Attach files below for this question.</p>
                       ) : (
                         <Input id={`q-${q.id}`} value={answers[q.id] ?? ""} onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })} />
                       )}
@@ -84,7 +84,7 @@ export default function PortalAnswerPage({ params }: { params: Promise<{ id: str
                   <div>
                     <Label htmlFor="files">Files (up to 10, 10 MB each: PDF, DOC, DOCX, PNG, JPG, WEBP, TXT)</Label>
                     <Input id="files" type="file" multiple accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,.txt" onChange={(e) => setFiles(Array.from(e.target.files ?? []))} />
-                    {files.length > 0 && <p className="text-xs text-zinc-500">{files.length} file(s) selected</p>}
+                    {files.length > 0 && <p className="text-xs text-warm-500">{files.length} file(s) selected</p>}
                   </div>
                   <div><Button disabled={submit.isPending} onClick={() => submit.mutate()}>Submit answers</Button></div>
                 </CardContent>

@@ -31,7 +31,7 @@ export default function ProjectsPage() {
   return (
     <AgencyGuard>
       <AgencyShell>
-        <PageHeader title="Projects" actions={<Link href="/projects/new" className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white">New project</Link>} />
+        <PageHeader title="Projects" actions={<Link href="/projects/new" className="rounded-xl bg-ink px-4 py-2 text-sm text-white">New project</Link>} />
         <form onSubmit={(e) => { e.preventDefault(); setPage(1); setQ(search); }} className="flex flex-col gap-2 sm:flex-row">
           <Input aria-label="Search projects" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} />
           <Select aria-label="Status filter" value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
@@ -47,12 +47,12 @@ export default function ProjectsPage() {
         <div className="mt-3">
           {isLoading && <ListSkeleton />}
           {error && <ErrorState message="Could not load projects." onRetry={() => refetch()} />}
-          {data && data.items.length === 0 && <EmptyState title="No projects" hint="Create your first project." action={<Link href="/projects/new" className="rounded-md bg-zinc-900 px-4 py-2 text-sm text-white">New project</Link>} />}
+          {data && data.items.length === 0 && <EmptyState title="No projects" hint="Create your first project." action={<Link href="/projects/new" className="rounded-xl bg-ink px-4 py-2 text-sm text-white">New project</Link>} />}
           {data && data.items.length > 0 && (
             <>
               <div className="hidden md:block">
                 <Table>
-                  <thead><tr className="border-b text-left text-xs text-zinc-500"><th className="p-2">Name</th><th className="p-2">Client</th><th className="p-2">Type</th><th className="p-2">Deadline</th><th className="p-2">Status</th></tr></thead>
+                  <thead><tr className="border-b text-left text-xs text-warm-500"><th className="p-2">Name</th><th className="p-2">Client</th><th className="p-2">Type</th><th className="p-2">Deadline</th><th className="p-2">Status</th></tr></thead>
                   <tbody>
                     {data.items.map((p: any) => (
                       <tr key={p.id} className="border-b last:border-0">
@@ -70,7 +70,7 @@ export default function ProjectsPage() {
                 {data.items.map((p: any) => (
                   <Card key={p.id}><CardContent>
                     <Link className="font-medium underline" href={`/projects/${p.id}`}>{p.name}</Link>
-                    <p className="text-xs text-zinc-500">{p.client?.name} · {p.projectType}</p>
+                    <p className="text-xs text-warm-500">{p.client?.name} · {p.projectType}</p>
                     <StatusBadge status={p.status} />
                   </CardContent></Card>
                 ))}

@@ -72,12 +72,12 @@ export default function WorkspaceSettingsPage() {
             </Card>
             <Card>
               <CardHeader><CardTitle>Owner</CardTitle></CardHeader>
-              <CardContent><p className="text-sm text-zinc-600">Owner ID: {data.ownerId}. The owner cannot be removed or demoted; at least one admin must remain.</p></CardContent>
+              <CardContent><p className="text-sm text-warm-600">Owner ID: {data.ownerId}. The owner cannot be removed or demoted; at least one admin must remain.</p></CardContent>
             </Card>
             <Card>
               <CardHeader><CardTitle>Danger zone</CardTitle></CardHeader>
               <CardContent className="grid gap-2">
-                <p className="text-sm text-zinc-600">Type the workspace name to confirm deletion.</p>
+                <p className="text-sm text-warm-600">Type the workspace name to confirm deletion.</p>
                 <Input aria-label="Confirmation" placeholder={data.name} value={confirm} onChange={(e) => setConfirm(e.target.value)} />
                 <div><Button variant="destructive" disabled={confirm !== data.name} onClick={() => setShowDelete(true)}>Delete workspace</Button></div>
               </CardContent>

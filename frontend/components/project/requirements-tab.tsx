@@ -93,10 +93,10 @@ export function RequirementsTab({ projectId }: { projectId: string }) {
         <Card>
           <CardHeader><CardTitle>Requirement Readiness: {readiness.data.score}%</CardTitle></CardHeader>
           <CardContent className="grid gap-2 text-sm">
-            <div className="h-2 overflow-hidden rounded bg-zinc-100">
-              <div className="h-full bg-zinc-900" style={{ width: `${readiness.data.score}%` }} />
+            <div className="h-2 overflow-hidden rounded bg-warm-100">
+              <div className="h-full bg-ink" style={{ width: `${readiness.data.score}%` }} />
             </div>
-            {readiness.data.summary && <p className="text-zinc-600">{readiness.data.summary}</p>}
+            {readiness.data.summary && <p className="text-warm-600">{readiness.data.summary}</p>}
             {(readiness.data.missingInformation ?? []).length > 0 && (
               <div>
                 <p className="font-medium">Missing information</p>
@@ -180,8 +180,8 @@ export function RequirementsTab({ projectId }: { projectId: string }) {
                 onChange={(e) => setChecked(e.target.checked ? [...checked, r.id] : checked.filter((c) => c !== r.id))}
               />
               <div className="flex-1">
-                <p className="font-medium"><span className="font-mono text-xs text-zinc-500">{r.code}</span> {r.title}</p>
-                <p className="flex flex-wrap items-center gap-1 text-xs text-zinc-500">
+                <p className="font-medium"><span className="font-mono text-xs text-warm-500">{r.code}</span> {r.title}</p>
+                <p className="flex flex-wrap items-center gap-1 text-xs text-warm-500">
                   <StatusBadge status={r.status} /> {r.source} · {r.priority}
                   {r.acceptanceCriteriaStatus === "AI_DRAFT" && <AiDraftLabel />}
                   {r.acceptanceCriteriaStatus === "REVIEWED" && <StatusBadge status="REVIEWED" />}
@@ -199,8 +199,8 @@ export function RequirementsTab({ projectId }: { projectId: string }) {
         {selected && (
           <div className="grid gap-2 text-sm">
             <p className="whitespace-pre-wrap">{selected.description}</p>
-            {selected.sourceContext && <div><p className="font-medium">Source excerpt</p><p className="whitespace-pre-wrap rounded bg-zinc-50 p-2 text-xs">{selected.sourceContext}</p></div>}
-            {selected.aiFlags && <div><p className="font-medium">AI flags</p><pre className="overflow-auto rounded bg-zinc-50 p-2 text-xs">{JSON.stringify(selected.aiFlags, null, 2)}</pre></div>}
+            {selected.sourceContext && <div><p className="font-medium">Source excerpt</p><p className="whitespace-pre-wrap rounded bg-warm-50 p-2 text-xs">{selected.sourceContext}</p></div>}
+            {selected.aiFlags && <div><p className="font-medium">AI flags</p><pre className="overflow-auto rounded bg-warm-50 p-2 text-xs">{JSON.stringify(selected.aiFlags, null, 2)}</pre></div>}
             <div>
               <p className="font-medium">Appears in</p>
               <ul className="list-disc pl-5 text-xs">

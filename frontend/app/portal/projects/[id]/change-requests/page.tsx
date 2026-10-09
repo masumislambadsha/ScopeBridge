@@ -64,10 +64,10 @@ export default function PortalChangeRequestsPage({ params }: { params: Promise<{
           {data?.changeRequests.map((c: any) => (
             <Card key={c.id}>
               <CardContent>
-                <p className="font-medium"><span className="font-mono text-xs text-zinc-500">{c.code}</span> {c.title}</p>
-                <p className="text-sm text-zinc-600">{c.description}</p>
+                <p className="font-medium"><span className="font-mono text-xs text-warm-500">{c.code}</span> {c.title}</p>
+                <p className="text-sm text-warm-600">{c.description}</p>
                 <p className="mt-1 flex flex-wrap gap-1"><StatusBadge status={c.status} />{c.aiClassification && <StatusBadge status={c.aiClassification} />}</p>
-                {c.aiRationale && <p className="mt-1 text-xs text-zinc-500">{c.aiRationale}</p>}
+                {c.aiRationale && <p className="mt-1 text-xs text-warm-500">{c.aiRationale}</p>}
               </CardContent>
             </Card>
           ))}

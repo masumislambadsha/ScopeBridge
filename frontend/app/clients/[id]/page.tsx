@@ -73,7 +73,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             <Card>
               <CardHeader><CardTitle>Portal access</CardTitle></CardHeader>
               <CardContent className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                <p className="flex-1 text-sm text-zinc-600">
+                <p className="flex-1 text-sm text-warm-600">
                   {data.portalUserId ? "This client has portal access." : "This client cannot log in yet."}
                 </p>
                 {!data.portalUserId && <Button onClick={() => invite.mutate()} disabled={invite.isPending}>Invite to portal</Button>}
@@ -112,7 +112,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
             <Card>
               <CardHeader><CardTitle>Projects ({data.projects?.length ?? 0})</CardTitle></CardHeader>
               <CardContent>
-                {(data.projects ?? []).length === 0 && <p className="text-sm text-zinc-500">No projects yet.</p>}
+                {(data.projects ?? []).length === 0 && <p className="text-sm text-warm-500">No projects yet.</p>}
                 <ul className="grid gap-1 text-sm">
                   {(data.projects ?? []).map((p: any) => (
                     <li key={p.id}><a className="underline" href={`/projects/${p.id}`}>{p.name}</a> <StatusBadge status={p.status} /></li>
@@ -124,7 +124,7 @@ export default function ClientDetailPage({ params }: { params: Promise<{ id: str
               <CardHeader><CardTitle>Danger zone</CardTitle></CardHeader>
               <CardContent>
                 <Button variant="destructive" onClick={() => setConfirmDelete(true)}>Delete client</Button>
-                <p className="mt-1 text-xs text-zinc-500">Clients with projects cannot be deleted — archive them instead.</p>
+                <p className="mt-1 text-xs text-warm-500">Clients with projects cannot be deleted — archive them instead.</p>
               </CardContent>
             </Card>
           </div>

@@ -78,7 +78,7 @@ export default function ClientsPage() {
             <>
               <div className="hidden md:block">
                 <Table>
-                  <thead><tr className="border-b text-left text-xs text-zinc-500"><th className="p-2">Name</th><th className="p-2">Email</th><th className="p-2">Company</th><th className="p-2">Projects</th><th className="p-2">Status</th></tr></thead>
+                  <thead><tr className="border-b text-left text-xs text-warm-500"><th className="p-2">Name</th><th className="p-2">Email</th><th className="p-2">Company</th><th className="p-2">Projects</th><th className="p-2">Status</th></tr></thead>
                   <tbody>
                     {data.items.map((c: any) => (
                       <tr key={c.id} className="border-b last:border-0">
@@ -95,7 +95,7 @@ export default function ClientsPage() {
                 {data.items.map((c: any) => (
                   <Card key={c.id}><CardContent>
                     <Link className="font-medium underline" href={`/clients/${c.id}`}>{c.name}</Link>
-                    <p className="text-xs text-zinc-500">{c.email} · {c.company ?? "—"}</p>
+                    <p className="text-xs text-warm-500">{c.email} · {c.company ?? "—"}</p>
                     <StatusBadge status={c.status} />
                   </CardContent></Card>
                 ))}
