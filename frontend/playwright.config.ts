@@ -17,6 +17,7 @@ const API_ENV = [
   "RATE_LIMIT_AUTH_MAX=100000",
   "RATE_LIMIT_AI_MAX=100000",
   "PORT=4100",
+  "LOG_LEVEL=error",
 ].join(" ");
 
 /**
