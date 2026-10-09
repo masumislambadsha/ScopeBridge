@@ -12,3 +12,7 @@ playwright-report/
 *.tsbuildinfo
 backend/.uploads/
 .neon
+
+# Local agent/tooling (neon skills, mcp)
+.agents/
+skills-lock.json
