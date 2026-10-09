@@ -7,9 +7,9 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
     <input
       ref={ref}
       className={cn(
-        "flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm",
-        "placeholder:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-11 w-full rounded-xl border border-warm-200 bg-white px-4 py-2 text-[15px]",
+        "placeholder:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-400 focus-visible:border-sage-300",
+        "disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white/5 dark:border-white/10",
         className,
       )}
       {...props}
@@ -23,9 +23,9 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
     <textarea
       ref={ref}
       className={cn(
-        "flex min-h-[80px] w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm",
-        "placeholder:text-zinc-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
-        "disabled:cursor-not-allowed disabled:opacity-50",
+        "flex min-h-[96px] w-full rounded-2xl border border-warm-200 bg-white px-4 py-3 text-[15px] leading-relaxed",
+        "placeholder:text-warm-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-400",
+        "disabled:cursor-not-allowed disabled:opacity-50 dark:bg-white/5 dark:border-white/10",
         className,
       )}
       {...props}
@@ -35,7 +35,7 @@ export const Textarea = React.forwardRef<HTMLTextAreaElement, React.TextareaHTML
 Textarea.displayName = "Textarea";
 
 export function Label({ className, ...props }: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  return <label className={cn("mb-1 block text-sm font-medium text-zinc-700", className)} {...props} />;
+  return <label className={cn("mb-1.5 block text-sm font-semibold text-warm-800 dark:text-warm-200", className)} {...props} />;
 }
 
 export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttributes<HTMLSelectElement>>(
@@ -43,8 +43,8 @@ export const Select = React.forwardRef<HTMLSelectElement, React.SelectHTMLAttrib
     <select
       ref={ref}
       className={cn(
-        "flex h-9 w-full rounded-md border border-zinc-300 bg-white px-3 py-1 text-sm",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
+        "flex h-11 w-full rounded-xl border border-warm-200 bg-white px-3 text-[15px]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-400 dark:bg-white/5 dark:border-white/10",
         className,
       )}
       {...props}
@@ -57,5 +57,5 @@ Select.displayName = "Select";
 
 export function FieldError({ message }: { message?: string }) {
   if (!message) return null;
-  return <p className="mt-1 text-xs text-red-600">{message}</p>;
+  return <p className="mt-1.5 text-xs font-medium text-red-600">{message}</p>;
 }

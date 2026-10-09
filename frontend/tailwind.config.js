@@ -1,6 +1,90 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
-  theme: { extend: {} },
+  darkMode: "class",
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        // Primary green-teal (care-io teal override)
+        teal: {
+          50: "#effef7",
+          100: "#dafeef",
+          200: "#b8fadd",
+          300: "#81f3c2",
+          400: "#43e49e",
+          500: "#1acd81",
+          600: "#0d9488",
+          700: "#108268",
+          800: "#126755",
+          900: "#115546",
+          950: "#03302b",
+        },
+        sage: {
+          50: "#f2f6f4",
+          100: "#e8edea",
+          200: "#c5d3cc",
+          300: "#a2b8b0",
+          400: "#7d9d94",
+          500: "#5a8a82",
+          600: "#4a7c74",
+          700: "#3a6a62",
+          800: "#1b3a33",
+          900: "#1e3d38",
+        },
+        warm: {
+          50: "#faf8f5",
+          100: "#f5f0ea",
+          200: "#e8e0d6",
+          300: "#d4c8b8",
+          400: "#b3a793",
+          500: "#94877a",
+          600: "#8a7c6f",
+          700: "#7a6e60",
+          800: "#3f3932",
+          900: "#2a2622",
+          950: "#0f0e0c",
+        },
+        clay: {
+          200: "#ebdad2",
+          500: "#c47a5a",
+          600: "#a86548",
+        },
+        ink: "#1a1a1a",
+        surface: "#fafbfb",
+        "surface-secondary": "#f4f6f8",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "sans-serif"],
+        serif: ["var(--font-playfair)", "Georgia", "serif"],
+      },
+      borderRadius: {
+        "4xl": "2rem",
+        "5xl": "2.5rem",
+      },
+      boxShadow: {
+        soft: "0 20px 50px -20px rgba(27,58,51,0.15)",
+        card: "0 8px 30px -12px rgba(0,0,0,0.12)",
+      },
+      keyframes: {
+        "fade-in": { from: { opacity: "0" }, to: { opacity: "1" } },
+        "fade-up": { from: { opacity: "0", transform: "translateY(24px)" }, to: { opacity: "1", transform: "translateY(0)" } },
+        "scale-in": { from: { opacity: "0", transform: "scale(0.95)" }, to: { opacity: "1", transform: "scale(1)" } },
+        float: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-10px)" } },
+        marquee: { from: { transform: "translateX(0)" }, to: { transform: "translateX(calc(-50% - var(--gap,2rem)))" } },
+        gradient: { "0%,100%": { backgroundPosition: "0% 50%" }, "50%": { backgroundPosition: "100% 50%" } },
+      },
+      animation: {
+        "fade-in": "fade-in 0.6s ease both",
+        "fade-up": "fade-up 0.6s cubic-bezier(0.22,1,0.36,1) both",
+        "scale-in": "scale-in 0.4s ease both",
+        float: "float 4s ease-in-out infinite",
+        marquee: "marquee var(--duration,40s) linear infinite",
+        gradient: "gradient 8s ease infinite",
+      },
+      maxWidth: {
+        shell: "1320px",
+      },
+    },
+  },
   plugins: [],
 };

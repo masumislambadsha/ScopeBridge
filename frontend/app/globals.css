@@ -1,3 +1,199 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-warm-50 text-warm-800 font-sans antialiased;
+  overflow-x: hidden;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.dark body {
+  background-color: #0f0e0c;
+  color: #e5e0d8;
+}
+
+::selection {
+  background: #99f6e4;
+  color: #03302b;
+}
+.dark ::selection {
+  background: #115546;
+  color: #effef7;
+}
+
+/* ---------- typography helpers (care-io) ---------- */
+.font-serif-display {
+  font-family: var(--font-playfair), Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+.hero-title {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  color: #1a1a1a;
+}
+.dark .hero-title {
+  color: #e8e3da;
+}
+.section-title {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: #1a1a1a;
+}
+.dark .section-title {
+  color: #ece6db;
+}
+.accent-word {
+  font-style: italic;
+  color: #4a7c74;
+}
+.dark .accent-word {
+  color: #a2b8b0;
+}
+.body-copy {
+  color: #7a6e60;
+}
+.dark .body-copy {
+  color: #b3aa9d;
+}
+
+/* ---------- pattern utilities ---------- */
+.bg-dot-pattern {
+  background-image: radial-gradient(#d4c8b8 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.dark .bg-dot-pattern {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+}
+.bg-grid-pattern {
+  background-image: linear-gradient(#e8e0d6 1px, transparent 1px),
+    linear-gradient(90deg, #e8e0d6 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.dark .bg-grid-pattern {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.text-balance {
+  text-wrap: balance;
+}
+
+/* ---------- reveal / blur-fade (no framer-motion needed) ---------- */
+.reveal-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.reveal-word {
+  display: inline-block;
+  transform: translateY(112%);
+  opacity: 0;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.7s ease;
+}
+.reveal-visible .reveal-word {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.blur-fade {
+  opacity: 0;
+  transform: translateY(6px);
+  filter: blur(6px);
+  transition: opacity 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+}
+.blur-fade-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-word,
+  .blur-fade {
+    transition: none;
+    transform: none;
+    opacity: 1;
+    filter: none;
+  }
+}
+
+/* ---------- marquee ---------- */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: var(--gap, 2rem);
+  animation: marquee var(--duration, 40s) linear infinite;
+}
+.marquee-paused:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ---------- spotlight / tilt ---------- */
+.spotlight-card {
+  position: relative;
+}
+.spotlight-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  background: radial-gradient(
+    var(--spot-size, 260px) circle at var(--x, 50%) var(--y, 50%),
+    var(--spot-glow, rgba(74, 124, 116, 0.12)),
+    transparent 70%
+  );
+}
+.spotlight-card:hover::before {
+  opacity: 1;
+}
+
+/* ---------- dark-mode remaps (simplified care-io) ---------- */
+.dark .bg-white {
+  background-color: #161310 !important;
+}
+.dark .bg-warm-50 {
+  background-color: #14110e !important;
+}
+.dark .bg-warm-100 {
+  background-color: #211d18 !important;
+}
+.dark .border-warm-100,
+.dark .border-warm-200 {
+  border-color: #2b2621 !important;
+}
+.dark .text-warm-800 {
+  color: #ece6db !important;
+}
+.dark .text-warm-700 {
+  color: #d9d2c5 !important;
+}
