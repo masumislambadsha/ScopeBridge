@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { AgencyShell } from "@/components/shells/agency-shell";
@@ -8,10 +9,11 @@ import { PageHeader } from "@/components/ui/layout";
 import { ListSkeleton, ErrorState } from "@/components/ui/states";
 import { StatusBadge } from "@/components/ui/badge";
 
-export default function ScopeVersionPage({ params }: { params: { id: string; versionId: string } }) {
+export default function ScopeVersionPage({ params }: { params: Promise<{ id: string; versionId: string }> }) {
+  const { versionId } = use(params);
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["scope-version", params.versionId],
-    queryFn: () => api.get<any>(`/api/scope-versions/${params.versionId}`).then((r) => r.data),
+    queryKey: ["scope-version", versionId],
+    queryFn: () => api.get<any>(`/api/scope-versions/${versionId}`).then((r) => r.data),
   });
 
   return (

@@ -3,12 +3,12 @@ import { z } from "zod";
 import { ah } from "../../core/http";
 import { requireAuth } from "../../middleware/auth";
 import { validate } from "../../middleware/validate";
-import { requireProjectAccess } from "../../middleware/access";
+import { requireProjectAccess, attachMembership } from "../../middleware/access";
 import * as C from "./portal.controller";
 
 const r = Router();
 
-r.get("/portal/projects", requireAuth, ah(C.projects));
+r.get("/portal/projects", requireAuth, attachMembership, ah(C.projects));
 r.get(
   "/portal/projects/:id",
   requireAuth,

@@ -13,20 +13,22 @@ function createClient() {
   return client;
 }
 
-function healthy(c: IORedis | undefined): c is IORedis {
-  return !!c && (c.status === "ready" || c.status === "connect" || c.status === "connecting" || c.status === "reconnecting");
+function isUsable(c: unknown): c is IORedis {
+  const s = (c as { status?: unknown } | null | undefined)?.status;
+  return s === "ready" || s === "connect" || s === "connecting" || s === "reconnecting" || s === "wait";
 }
 
 /**
- * Shared client. Replaces a dead cached instance (status 'end') instead of
- * reusing it — test runners re-evaluate modules per file while globalThis
- * persists, and teardown disconnects the old client.
+ * Shared client. Replaces a dead cached instance instead of reusing it —
+ * test runners re-evaluate modules per file while globalThis persists,
+ * and teardown disconnects the old client.
  */
 function getShared(): IORedis {
-  const stale = globalForRedis.redis as IORedis | undefined;
-  if (healthy(stale)) return stale;
+  const cached: unknown = globalForRedis.redis;
+  if (isUsable(cached)) return cached;
+  const dead = cached as { disconnect?: () => void } | null | undefined;
   try {
-    stale?.disconnect();
+    dead?.disconnect?.();
   } catch {
     /* already dead */
   }

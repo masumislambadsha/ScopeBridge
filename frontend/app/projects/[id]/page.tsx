@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { use, useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useSocket } from "@/lib/socket";
@@ -18,7 +18,6 @@ import { TasksTab } from "@/components/project/tasks-tab";
 import { ChangeRequestsTab } from "@/components/project/change-requests-tab";
 import { MessagesTab } from "@/components/project/messages-tab";
 import { ActivityTab } from "@/components/project/activity-tab";
-import { useEffect } from "react";
 
 const TABS = [
   { id: "overview", label: "Overview" },
@@ -32,18 +31,19 @@ const TABS = [
   { id: "activity", label: "Activity" },
 ];
 
-export default function ProjectDetailPage({ params }: { params: { id: string } }) {
+export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const [tab, setTab] = useState("overview");
   const { joinProject } = useSocket();
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["project", params.id],
-    queryFn: () => api.get<any>(`/api/projects/${params.id}`).then((r) => r.data),
+    queryKey: ["project", id],
+    queryFn: () => api.get<any>(`/api/projects/${id}`).then((r) => r.data),
   });
 
   useEffect(() => {
-    joinProject(params.id);
+    joinProject(id);
     return () => joinProject(null);
-  }, [params.id, joinProject]);
+  }, [id, joinProject]);
 
   return (
     <AgencyGuard>
@@ -55,15 +55,15 @@ export default function ProjectDetailPage({ params }: { params: { id: string } }
             <PageHeader title={data.name} hint={`${data.client?.name ?? ""} · ${data.projectType}`} actions={<StatusBadge status={data.status} />} />
             <Tabs tabs={TABS} active={tab} onChange={setTab} />
             <div className="mt-3">
-              {tab === "overview" && <OverviewTab projectId={params.id} />}
-              {tab === "requests" && <RequestsTab projectId={params.id} />}
-              {tab === "submissions" && <SubmissionsTab projectId={params.id} />}
-              {tab === "requirements" && <RequirementsTab projectId={params.id} />}
-              {tab === "scope" && <ScopeTab projectId={params.id} />}
-              {tab === "tasks" && <TasksTab projectId={params.id} />}
-              {tab === "changes" && <ChangeRequestsTab projectId={params.id} />}
-              {tab === "messages" && <MessagesTab projectId={params.id} />}
-              {tab === "activity" && <ActivityTab projectId={params.id} />}
+              {tab === "overview" && <OverviewTab projectId={id} />}
+              {tab === "requests" && <RequestsTab projectId={id} />}
+              {tab === "submissions" && <SubmissionsTab projectId={id} />}
+              {tab === "requirements" && <RequirementsTab projectId={id} />}
+              {tab === "scope" && <ScopeTab projectId={id} />}
+              {tab === "tasks" && <TasksTab projectId={id} />}
+              {tab === "changes" && <ChangeRequestsTab projectId={id} />}
+              {tab === "messages" && <MessagesTab projectId={id} />}
+              {tab === "activity" && <ActivityTab projectId={id} />}
             </div>
           </>
         )}

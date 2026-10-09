@@ -1,4 +1,5 @@
 "use client";
+import { use } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { PortalShell } from "@/components/shells/portal-shell";
@@ -8,10 +9,11 @@ import { PageHeader } from "@/components/ui/layout";
 import { ListSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 import { StatusBadge } from "@/components/ui/badge";
 
-export default function PortalRequirementsPage({ params }: { params: { id: string } }) {
+export default function PortalRequirementsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["portal-project", params.id, "reqs"],
-    queryFn: () => api.get<any>(`/api/portal/projects/${params.id}`).then((r) => r.data),
+    queryKey: ["portal-project", id, "reqs"],
+    queryFn: () => api.get<any>(`/api/portal/projects/${id}`).then((r) => r.data),
   });
 
   return (

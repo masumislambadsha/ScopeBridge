@@ -1,7 +1,7 @@
 "use client";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { api, setAccessToken } from "./api";
+import { api, setAccessToken, restoreSession, ApiError } from "./api";
 
 export interface Membership {
   workspaceId: string;
@@ -34,6 +34,8 @@ interface Session {
 
 interface AuthCtx {
   session: Session | null;
+  /** True once a session has ever loaded: guards must not unmount/yank on transient flaps. */
+  hadSession: boolean;
   loading: boolean;
   login: (email: string, password: string, inviteToken?: string) => Promise<void>;
   register: (name: string, email: string, password: string, inviteToken?: string) => Promise<void>;
@@ -50,6 +52,7 @@ function landingFor(s: Session): string {
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [hadSession, setHadSession] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -57,23 +60,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const j = await api.get<Session>("/api/auth/me");
       setSession(j.data);
-    } catch {
-      setSession(null);
-      setAccessToken(null);
+      setHadSession(true);
+    } catch (e) {
+      // Only a 401 means "not authenticated". Network/other errors keep the
+      // existing session so the app never unmounts on transient failures.
+      if (e instanceof ApiError && e.status === 401) {
+        setSession(null);
+        setAccessToken(null);
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
   // Restore session on app load via refresh (first-party cookie, §3.3).
+  // Goes through the shared single-flight refresh — never races request retries.
   useEffect(() => {
     (async () => {
       try {
-        const r = await fetch("/api/auth/refresh", { method: "POST", credentials: "include" });
-        if (r.ok) {
-          const j = await r.json().catch(() => null);
-          if (j?.data?.accessToken) setAccessToken(j.data.accessToken as string);
-        }
+        await restoreSession();
       } catch {
         /* no session */
       }
@@ -86,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(j.data.accessToken);
     const me = await api.get<Session>("/api/auth/me");
     setSession(me.data);
+    setHadSession(true);
     router.push(landingFor(me.data));
   }
 
@@ -94,6 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setAccessToken(j.data.accessToken);
     const me = await api.get<Session>("/api/auth/me");
     setSession(me.data);
+    setHadSession(true);
     router.push(landingFor(me.data));
   }
 
@@ -108,7 +115,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push("/login");
   }
 
-  return <Ctx.Provider value={{ session, loading, login, register, logout, reload }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ session, hadSession, loading, login, register, logout, reload }}>{children}</Ctx.Provider>;
 }
 
 export const useAuth = () => useContext(Ctx);

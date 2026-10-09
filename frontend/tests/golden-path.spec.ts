@@ -28,6 +28,7 @@ async function inviteLinkTo(email: string): Promise<string> {
 }
 
 test('golden path: intake → v1 → tasks → CR → v2 → implemented', async ({ browser }: { browser: Browser }) => {
+  test.slow(); // full lifecycle with AI polling takes several minutes
   const pmCtx = await browser.newContext();
   const clientCtx = await browser.newContext();
   const teamCtx = await browser.newContext();
@@ -54,7 +55,7 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
   await pm.getByLabel('Name').fill('E2E Client Co');
   await pm.getByLabel('Email').fill(clientEmail);
   await pm.getByRole('button', { name: 'Add client' }).click();
-  await expect(pm.getByText('E2E Client Co')).toBeVisible();
+  await expect(pm.getByText('E2E Client Co').first()).toBeVisible();
 
   // Team member accepts via Mailpit link.
   const teamToken = await inviteLinkTo(teamEmail);
@@ -63,7 +64,7 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
 
   // 2. PM invites client to portal + creates e-commerce project.
   await pm.goto('/clients');
-  await pm.getByText('E2E Client Co').click();
+  await pm.getByRole('link', { name: 'E2E Client Co' }).first().click();
   await pm.getByRole('button', { name: 'Invite to portal' }).click();
   await expect(pm.getByText('portal access', { exact: false })).toBeVisible();
   await pm.goto('/projects/new');
@@ -76,22 +77,22 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
   const projectId = projectUrl.split('/projects/')[1].split(/[?#]/)[0];
 
   // 3. PM generates AI checklist questions + sends the information request.
-  await pm.getByRole('tab', { name: 'Requests' }).click();
+  await pm.getByRole('tab', { name: 'Requests', exact: true }).click();
   await pm.getByLabel('Title').fill('E2E discovery');
   await pm.getByRole('button', { name: 'AI suggest questions' }).click();
-  await expect(pm.getByText(/remove/)).toBeVisible();
+  await expect(pm.getByText(/remove/).first()).toBeVisible();
   await pm.getByRole('button', { name: /Create request/ }).click();
-  await expect(pm.getByText('E2E discovery')).toBeVisible();
+  await expect(pm.getByText('E2E discovery').first()).toBeVisible();
   await pm.getByRole('button', { name: 'Send' }).click();
   await pm.getByRole('button', { name: 'Send', exact: true }).last().click();
-  await expect(pm.getByText('SENT')).toBeVisible();
+  await expect(pm.getByText('SENT').first()).toBeVisible();
 
   // 4. Client accepts invite, answers, uploads PDF.
   const clientToken = await inviteLinkTo(clientEmail);
   await register(client, 'E2E Client', clientEmail, clientToken);
   await expect(client).toHaveURL(/\/portal/);
   await client.goto(`/portal/projects/${projectId}`);
-  await expect(client.getByText('E2E Shop')).toBeVisible();
+  await expect(client.getByText('E2E Shop').first()).toBeVisible();
   await client.getByText('E2E discovery').click();
   await client.getByLabel(/Describe|goals|business/i).first().fill('We sell handmade soaps online');
   await client.setInputFiles('#files', 'tests/fixtures/catalog.pdf');
@@ -99,7 +100,7 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
   await expect(client.getByText(/submitted/i)).toBeVisible();
 
   // 5. Requirements extracted → readiness → clarification → answer.
-  await pm.getByRole('tab', { name: 'Requirements' }).click();
+  await pm.getByRole('tab', { name: 'Requirements', exact: true }).click();
   await expect.poll(async () => pm.getByText(/REQ-/).count(), { timeout: 90_000 }).toBeGreaterThan(0);
   await expect(pm.getByText(/Readiness/)).toBeVisible({ timeout: 90_000 });
   await pm.getByRole('checkbox').first().check();
@@ -117,30 +118,31 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
   await pm.getByRole('button', { name: /Mark ready/ }).click();
   await pm.getByRole('button', { name: 'Approve' }).first().click();
   await pm.getByRole('button', { name: 'Approve', exact: true }).last().click();
-  await pm.getByRole('tab', { name: 'Scope' }).click();
+  await pm.getByRole('tab', { name: 'Scope', exact: true }).click();
   await pm.getByRole('button', { name: 'Create scope' }).click();
-  await expect(pm.getByText(/v1/)).toBeVisible();
+  await expect(pm.getByText(/v1/).first()).toBeVisible();
   await pm.getByRole('button', { name: /Generate acceptance criteria/ }).click();
   await pm.getByRole('button', { name: 'Edit draft' }).click({ timeout: 90_000 });
+  await pm.getByRole('button', { name: /\+ REQ-/ }).first().click();
   await pm.getByRole('button', { name: 'Save draft' }).click();
   await pm.getByRole('button', { name: 'Send for approval' }).click();
   await pm.getByRole('button', { name: 'Send', exact: true }).last().click();
-  await expect(pm.getByText('PENDING_APPROVAL')).toBeVisible();
+  await expect(pm.getByText('PENDING_APPROVAL').first()).toBeVisible();
 
   // 7. Client approves v1 → certificate.
   await client.goto(`/portal/projects/${projectId}/scope`);
   await client.getByRole('button', { name: 'Approve' }).click();
   await client.getByLabel(/full name as signature/i).fill('E2E Client');
   await client.getByRole('button', { name: 'Confirm' }).click();
-  await expect(client.getByText(/APPROVED/)).toBeVisible();
+  await expect(client.getByText(/APPROVED/).first()).toBeVisible();
 
   // 8. PM generates tasks, assigns; team → REVIEW; PM completes.
-  await pm.getByRole('tab', { name: 'Tasks' }).click();
+  await pm.getByRole('tab', { name: 'Tasks', exact: true }).click();
   await pm.getByRole('button', { name: /Generate from approved scope/ }).click();
   await pm.getByRole('button', { name: /Preview from v1/ }).click();
   await expect(pm.getByText(/proposed tasks/)).toBeVisible({ timeout: 60_000 });
   await pm.getByRole('button', { name: /Confirm \+ create/ }).click();
-  await expect(pm.getByText(/TASK-/)).toBeVisible();
+  await expect(pm.getByText(/TASK-/).first()).toBeVisible();
   await pm.getByRole('button', { name: 'List', exact: true }).click();
   await team.goto('/tasks');
   const review = team.getByLabel('Move task').first();
@@ -153,8 +155,8 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
   await client.getByLabel('Title').fill('Wishlist');
   await client.getByLabel('Description').fill('Customers want a wishlist page with sharing');
   await client.getByRole('button', { name: 'Submit request' }).click();
-  await expect(client.getByText('Wishlist')).toBeVisible();
-  await pm.getByRole('tab', { name: 'Change Requests' }).click();
+  await expect(client.getByText('Wishlist').first()).toBeVisible();
+  await pm.getByRole('tab', { name: 'Change Requests', exact: true }).click();
   await pm.getByRole('button', { name: 'Review' }).first().click();
   await expect.poll(async () => pm.getByText(/OUT_OF_SCOPE|IN_SCOPE|POSSIBLY_RELATED/).count(), { timeout: 90_000 }).toBeGreaterThan(0);
 
@@ -164,7 +166,7 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
   await pm.getByRole('button', { name: 'Confirm approval' }).click();
   await expect(pm.getByText(/v\(n\+1\) draft proposed/)).toBeVisible();
   await pm.keyboard.press('Escape');
-  await pm.getByRole('tab', { name: 'Scope' }).click();
+  await pm.getByRole('tab', { name: 'Scope', exact: true }).click();
   await pm.getByLabel('Version').selectOption('v2 — DRAFT');
   await pm.getByRole('button', { name: 'Send for approval' }).click();
   await pm.getByRole('button', { name: 'Send', exact: true }).last().click();
@@ -172,11 +174,11 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
   await client.getByRole('button', { name: 'Approve' }).click();
   await client.getByLabel(/full name as signature/i).fill('E2E Client');
   await client.getByRole('button', { name: 'Confirm' }).click();
-  await pm.getByRole('tab', { name: 'Change Requests' }).click();
+  await pm.getByRole('tab', { name: 'Change Requests', exact: true }).click();
   await expect(pm.getByText('APPROVED').first()).toBeVisible();
 
   // 11. New tasks generated + completed → IMPLEMENTED.
-  await pm.getByRole('tab', { name: 'Tasks' }).click();
+  await pm.getByRole('tab', { name: 'Tasks', exact: true }).click();
   await pm.getByRole('button', { name: /Generate from approved scope/ }).click();
   await pm.getByRole('button', { name: /Preview from v2/ }).click();
   await pm.getByRole('button', { name: /Confirm \+ create/ }).click();
@@ -188,11 +190,11 @@ test('golden path: intake → v1 → tasks → CR → v2 → implemented', async
 
   // 12. Dashboard counts + activity entries.
   await pm.goto('/dashboard');
-  await expect(pm.getByText(/Projects/)).toBeVisible();
+  await expect(pm.getByText(/Projects/).first()).toBeVisible();
   await pm.goto(`/projects/${projectId}`);
-  await pm.getByRole('tab', { name: 'Activity' }).click();
-  await expect(pm.getByText('scope.version.approved')).toBeVisible();
-  await expect(pm.getByText('cr.implemented')).toBeVisible();
+  await pm.getByRole('tab', { name: 'Activity', exact: true }).click();
+  await expect(pm.getByText('scope.version.approved').first()).toBeVisible();
+  await expect(pm.getByText('cr.implemented').first()).toBeVisible();
 
   await pmCtx.close();
   await clientCtx.close();

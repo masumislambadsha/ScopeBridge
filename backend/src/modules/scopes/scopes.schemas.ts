@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { datetimeNullableOptional } from "../../core/zod";
 
 const criterionSchema = z.object({ given: z.string(), when: z.string(), then: z.string() });
 
@@ -23,7 +24,7 @@ export const patchVersionSchema = z.object({
   deliverables: z.array(z.string().max(500)).optional(),
   exclusions: z.array(z.string().max(500)).optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH", "CRITICAL"]).optional(),
-  deadline: z.string().datetime().nullable().optional(),
+  deadline: datetimeNullableOptional,
 });
 
 export const scopesQuerySchema = z.object({

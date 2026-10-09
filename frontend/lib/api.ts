@@ -39,15 +39,12 @@ async function raw(path: string, opts: RequestInit = {}) {
 async function req<T>(path: string, opts: RequestInit = {}, retried = false): Promise<{ data: T; meta?: { page: number; limit: number; total: number; totalPages: number; unreadCount?: number } }> {
   const res = await raw(path, opts);
   if (res.status === 401 && !retried && !path.includes("/api/auth/")) {
-    // Refresh once (first-party cookie) and retry.
-    const r = await raw("/api/auth/refresh", { method: "POST" });
-    if (r.ok) {
-      const j = await r.json().catch(() => null);
-      const next = j?.data?.accessToken as string | undefined;
-      if (next) {
-        accessToken = next;
-        return req(path, opts, true);
-      }
+    // Refresh once (first-party cookie) and retry. Single-flight so concurrent
+    // 401s don't race the single-use refresh token.
+    const next = await sharedRefresh();
+    if (next) {
+      accessToken = next;
+      return req(path, opts, true);
     }
   }
   const json = await res.json().catch(() => null);
@@ -56,6 +53,33 @@ async function req<T>(path: string, opts: RequestInit = {}, retried = false): Pr
     throw new ApiError(res.status, e.code ?? "INTERNAL", e.message ?? `Request failed (${res.status})`, e.details);
   }
   return json;
+}
+
+let refreshPromise: Promise<string | null> | null = null;
+
+function sharedRefresh(): Promise<string | null> {
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      try {
+        const r = await raw("/api/auth/refresh", { method: "POST" });
+        if (!r.ok) return null;
+        const j = await r.json().catch(() => null);
+        return (j?.data?.accessToken as string | undefined) ?? null;
+      } catch {
+        return null;
+      } finally {
+        refreshPromise = null;
+      }
+    })();
+  }
+  return refreshPromise;
+}
+
+/** Restore the session on app load. Single-flight with request-triggered refreshes. */
+export async function restoreSession(): Promise<string | null> {
+  const next = await sharedRefresh();
+  if (next) accessToken = next;
+  return next;
 }
 
 export const api = {

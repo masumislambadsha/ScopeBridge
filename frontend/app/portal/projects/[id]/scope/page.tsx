@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { use, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
@@ -13,7 +13,8 @@ import { ListSkeleton, EmptyState, ErrorState } from "@/components/ui/states";
 import { StatusBadge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
 
-export default function PortalScopePage({ params }: { params: { id: string } }) {
+export default function PortalScopePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const qc = useQueryClient();
   const [versionId, setVersionId] = useState<string | null>(null);
   const [decide, setDecide] = useState<null | { approvalId: string; kind: "approve" | "reject" | "changes" }>(null);
@@ -21,8 +22,8 @@ export default function PortalScopePage({ params }: { params: { id: string } }) 
   const [signature, setSignature] = useState("");
 
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["portal-project", params.id, "scope"],
-    queryFn: () => api.get<any>(`/api/portal/projects/${params.id}`).then((r) => r.data),
+    queryKey: ["portal-project", id, "scope"],
+    queryFn: () => api.get<any>(`/api/portal/projects/${id}`).then((r) => r.data),
   });
 
   const inv = () => {

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { use, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -27,25 +27,26 @@ const schema = z.object({
   status: z.enum(["ACTIVE", "INACTIVE", "ARCHIVED"]),
 });
 
-export default function ClientDetailPage({ params }: { params: { id: string } }) {
+export default function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
   const qc = useQueryClient();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const { data, isLoading, error, refetch } = useQuery({
-    queryKey: ["client", params.id],
-    queryFn: () => api.get<any>(`/api/clients/${params.id}`).then((r) => r.data),
+    queryKey: ["client", id],
+    queryFn: () => api.get<any>(`/api/clients/${id}`).then((r) => r.data),
   });
   const form = useForm<z.infer<typeof schema>>({ resolver: zodResolver(schema) });
   const save = useMutation({
-    mutationFn: (v: z.infer<typeof schema>) => api.patch(`/api/clients/${params.id}`, v),
+    mutationFn: (v: z.infer<typeof schema>) => api.patch(`/api/clients/${id}`, v),
     onSuccess: () => {
       toast.success("Client updated");
-      void qc.invalidateQueries({ queryKey: ["client", params.id] });
+      void qc.invalidateQueries({ queryKey: ["client", id] });
       void qc.invalidateQueries({ queryKey: ["clients"] });
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Update failed"),
   });
   const remove = useMutation({
-    mutationFn: () => api.del(`/api/clients/${params.id}`),
+    mutationFn: () => api.del(`/api/clients/${id}`),
     onSuccess: () => {
       toast.success("Client deleted");
       window.location.href = "/clients";
@@ -53,10 +54,10 @@ export default function ClientDetailPage({ params }: { params: { id: string } })
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Delete failed"),
   });
   const invite = useMutation({
-    mutationFn: () => api.post(`/api/clients/${params.id}/portal-invite`, {}),
+    mutationFn: () => api.post(`/api/clients/${id}/portal-invite`, {}),
     onSuccess: () => {
       toast.success("Portal invitation sent by email");
-      void qc.invalidateQueries({ queryKey: ["client", params.id] });
+      void qc.invalidateQueries({ queryKey: ["client", id] });
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Invite failed"),
   });
