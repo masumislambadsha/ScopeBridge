@@ -12,14 +12,15 @@ Update at the end of every phase: done / verified / next. Phase list mirrors spe
 - [x] **Phase 7 — Tasks**: firewall (APPROVED version + APPROVED CR required, single+bulk), generate-tasks preview (+onlyNew), TASK-xxx codes, team-ceiling status rules, completedAt, my-tasks. Verified: smoke #35–42 + firewall suite. Next: Phase 8.
 - [x] **Phase 8 — Change requests**: base version auto-set + 409 guidance, file support, auto AI-05, UNDER_REVIEW flow, approve (IN_SCOPE close vs v2 DRAFT proposal + CHANGE_REQUEST requirements), reject with reason, IMPLEMENTED automation + manual. Verified: smoke #43–54 + cr-flow suite. Next: Phase 9.
 - [x] **Phase 9 — Comms/notifications/reminders/audit/dashboard/traceability**: CLIENT/INTERNAL messages + realtime + notifications, notify() matrix + bell data + read-all, hourly idempotent reminders (SYSTEM-audited), audit() across services, analytics (workspace + my-work), traceability chain + stage stepper data. Verified: smoke #55–64, #68–70 + reminders suite. Next: Phase 10 (frontend + E2E).
-- [ ] **Phase 2 — Data model + access control (`feature/workspace`)**. Next: Phase 3.
-- [ ] **Phase 3 — Auth/team/clients + frontend foundation**. Next: Phase 4.
-- [ ] **Phase 4 — Projects, portal, intake**. Next: Phase 5.
-- [ ] **Phase 5 — Requirements + AI-01/02/03**. Next: Phase 6.
-- [ ] **Phase 6 — Scope + approval**. Next: Phase 7.
-- [ ] **Phase 7 — Tasks**. Next: Phase 8.
-- [ ] **Phase 8 — Change requests**. Next: Phase 9.
-- [ ] **Phase 9 — Comms/notifications/reminders/audit/dashboard/traceability**. Next: Phase 10.
+- [x] **Phase 2 — Data model + access control**: complete (see Phase 1 entry).
+- [x] **Phase 3 — Auth/team/clients + frontend foundation**: complete.
+- [x] **Phase 4 — Projects, portal, intake**: complete.
+- [x] **Phase 5 — Requirements + AI-01/02/03**: complete.
+- [x] **Phase 6 — Scope + approval**: complete.
+- [x] **Phase 7 — Tasks**: complete.
+- [x] **Phase 8 — Change requests**: complete.
+- [x] **Phase 9 — Comms/notifications/reminders/audit/dashboard/traceability**: complete.
 - [x] **Phase 10 — E2E and hardening (`feature/frontend-shell`)**: Playwright webServer (API :4100 + worker + Next :3000, mock AI, Mailpit), golden-path spec (12 steps, PM+client+team contexts, invite links via Mailpit API, PDF fixture), negative spec (portal isolation, route bounces), mobile spec (Pixel 7, no horizontal scroll). Backend verified live: 70/70 smoke assertions. `openapi:check` green (106 routes). Responsive (375/768/1280+) + a11y basics (labels, focus rings, keyboard dialogs) built into every page. Next: Phase 11.
 - [x] **Phase 11 — Documentation (`feature/frontend-shell`)**: README + `docs/01`–`15` + DEPLOYMENT.md + DECISIONS/PROGRESS, Mermaid ERD/architecture/SDA matching code, `docs/openapi.json` (75 paths/106 ops), PDF moved to `docs/requirements/`. Next: Phase 12.
 - [x] **Phase 12 — Deployment and release**: `render.yaml` (compiled API + worker, `/ready` health, full env) + `vercel.json` per §12; Vercel/Render CLIs unauthenticated → `docs/DEPLOYMENT.md` click-by-click + env tables as the remaining human steps (no URLs invented). Release PR `develop` → `main`, tag `v1.0.0`. Next: human review + `npm install` + deploy.
+- [x] **Phase 13 — Verification & release (`chore/verify`)**: full-suite E2E against live stack; fixed portal access resolution, empty-date Zod rejection, session resilience (sessionStorage mirror + single-flight refresh), message composer race, missing task-assignment UI (PM assignee Select), CR AI-badge live refresh, `cr.version_proposed` realtime event, strict-duplicate selector hardening, dep upgrades (next ^15.5, nodemailer ^10, postcss, redis-emitter). Verified: backend vitest 35/35, frontend typecheck/lint/build clean, Playwright E2E 8/8, openapi:check 106/106, audit 0 high. Merged `chore/verify` → `develop` → `main`, tag `v1.0.0`. Remaining: human review + deploy.
