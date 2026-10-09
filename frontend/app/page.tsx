@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "motion/react";
-import { ArrowRight, CheckCircle2, HeartHandshake, Inbox, ListChecks, FileCheck, PenLine, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, HeartHandshake, Inbox, ListChecks, FileCheck, PenLine, ShieldCheck, Sparkles, Star } from "lucide-react";
 import { Eyebrow } from "@/components/eyebrow";
 import { RevealText } from "@/components/reveal-text";
 import { Magnetic } from "@/components/magnetic";
@@ -48,9 +48,12 @@ export default function Landing() {
               <div className="relative grid items-center gap-12 lg:grid-cols-12">
                 <div className="lg:col-span-7">
                   <BlurFade inView>
-                    <Eyebrow>Scope management for agencies</Eyebrow>
+                    <span className="inline-flex items-center gap-2 rounded-full border border-sage-200/60 bg-sage-100/50 px-4 py-1.5 text-xs font-medium uppercase tracking-[0.15em] text-sage-700 dark:border-white/10 dark:bg-white/5 dark:text-sage-300">
+                      <ShieldCheck size={14} />
+                      Scope management for agencies
+                    </span>
                   </BlurFade>
-                  <h1 className="hero-title mt-5 text-balance">
+                  <h1 className="hero-title mt-6 text-balance">
                     <RevealText pre="Kill scope creep" accent="before it kills" post="your margin." />
                   </h1>
                   <BlurFade inView delay={0.25}>
@@ -76,25 +79,76 @@ export default function Landing() {
                       </Link>
                     </div>
                   </BlurFade>
+
+                  {/* social proof — care-io hero pattern */}
                   <BlurFade inView delay={0.45}>
-                    <dl className="mt-10 flex flex-wrap gap-8">
-                      {[[42, "scope versions locked", "+"], [18, "change requests firewalled", "+"], [99, "% approvals traceable", "%"]].map(([v, label, suffix]) => (
-                        <div key={label as string}>
-                          <dt className="sr-only">{label as string}</dt>
-                          <dd className="font-serif text-3xl text-ink dark:text-warm-50">
-                            <NumberTicker value={v as number} />{suffix as string}
-                          </dd>
-                          <dd className="text-sm text-warm-500">{label as string}</dd>
+                    <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
+                      <div className="flex items-center gap-4">
+                        <div className="flex -space-x-3">
+                          {["Agency", "Studio", "North", "Bright"].map((name) => (
+                            <motion.div
+                              key={name}
+                              whileHover={{ y: -6, scale: 1.1 }}
+                              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                              className="w-9 h-9 rounded-full border-2 border-warm-50 dark:border-warm-950 bg-gradient-to-br from-sage-200 to-sage-300 flex items-center justify-center text-xs font-semibold text-sage-700 cursor-pointer"
+                            >
+                              {name[0].toUpperCase()}
+                            </motion.div>
+                          ))}
+                          <motion.div
+                            whileHover={{ y: -6, scale: 1.1 }}
+                            transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                            className="w-9 h-9 rounded-full border-2 border-warm-50 dark:border-warm-950 bg-sage-500 flex items-center justify-center text-[10px] font-medium text-white cursor-pointer"
+                          >
+                            +
+                          </motion.div>
                         </div>
-                      ))}
+                        <p className="text-sm text-warm-700 dark:text-warm-300">
+                          <span className="font-semibold text-ink dark:text-warm-50">New</span> agencies joining every month
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-warm-700 dark:text-warm-300">
+                        <Star size={16} className="text-amber-500 fill-amber-500" />
+                        <span className="font-semibold text-ink dark:text-warm-50">Rated</span> by agency owners
+                      </div>
+                    </div>
+                  </BlurFade>
+
+                  <BlurFade inView delay={0.55}>
+                    <dl className="mt-10 flex flex-wrap gap-8 border-t border-warm-200/70 pt-8 dark:border-white/10">
+                      {[
+                        [FileCheck, 42, "scope versions locked", "+"],
+                        [ShieldCheck, 18, "change requests firewalled", "+"],
+                        [PenLine, 99, "% approvals traceable", "%"],
+                      ].map(([icon, v, label, suffix]) => {
+                        const Icon = icon as typeof FileCheck;
+                        return (
+                          <div key={label as string} className="flex items-center gap-3">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sage-100 text-sage-700 dark:bg-white/10 dark:text-sage-300">
+                              <Icon size={18} />
+                            </span>
+                            <div>
+                              <dt className="sr-only">{label as string}</dt>
+                              <dd className="font-serif text-2xl leading-none text-ink dark:text-warm-50">
+                                <NumberTicker value={v as number} />{suffix as string}
+                              </dd>
+                              <dd className="mt-1 text-sm text-warm-500">{label as string}</dd>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </dl>
                   </BlurFade>
                 </div>
 
-                <div className="lg:col-span-5">
+                <div className="hidden lg:col-span-5 lg:block">
                   <BlurFade inView delay={0.25}>
                     <div className="relative">
-                      <TiltCard max={7} className="rounded-[2rem]">
+                      {/* stacked deck behind the main card for depth */}
+                      <div aria-hidden className="absolute inset-x-4 top-4 h-full rounded-[2rem] border border-warm-200/50 bg-white/40 dark:bg-white/[0.03]" />
+                      <div aria-hidden className="absolute inset-x-2 top-2 h-full rounded-[2rem] border border-warm-200/60 bg-white/60 dark:bg-white/[0.05]" />
+
+                      <TiltCard max={7} className="relative rounded-[2rem]">
                         <div className="relative rounded-[2rem] border border-warm-200/70 bg-white/90 p-6 shadow-soft backdrop-blur-2xl dark:bg-[#161310]">
                           <div className="flex items-center gap-2">
                             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-sage-600 text-white"><HeartHandshake size={17} /></span>
@@ -104,6 +158,24 @@ export default function Landing() {
                             </div>
                             <span className="ml-auto rounded-full bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-800">Pending</span>
                           </div>
+
+                          {/* progress */}
+                          <div className="mt-5">
+                            <div className="flex items-center justify-between text-xs text-warm-500">
+                              <span>Requirements traced</span>
+                              <span className="font-semibold text-sage-600">12 / 14</span>
+                            </div>
+                            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-warm-200/70 dark:bg-white/10">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                whileInView={{ width: "86%" }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
+                                className="h-full rounded-full bg-gradient-to-r from-sage-600 to-teal-500"
+                              />
+                            </div>
+                          </div>
+
                           <div className="mt-5 grid gap-2.5 text-sm">
                             {[
                               ["REQ-001", "Client provides brand assets", "READY", "bg-blue-50 text-blue-700"],
@@ -117,6 +189,7 @@ export default function Landing() {
                               </div>
                             ))}
                           </div>
+
                           <div className="mt-4 flex items-center gap-2 rounded-2xl bg-ink p-3.5 text-sm text-warm-50 dark:bg-sage-600">
                             <CheckCircle2 size={16} />
                             <span className="font-medium">Traceability: 100% linked</span>
@@ -124,19 +197,33 @@ export default function Landing() {
                           </div>
                         </div>
                       </TiltCard>
+
                       <motion.div
-                        animate={{ y: [0, -10, 0] }}
+                        animate={{ y: [0, -8, 0] }}
                         transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="absolute -right-4 -top-4 rounded-full border border-warm-200/70 bg-white px-4 py-2 text-xs font-semibold shadow-xl"
+                        className="absolute -top-5 -right-5 flex items-center gap-2.5 rounded-2xl border border-warm-200/70 bg-white/90 px-4 py-3 shadow-xl backdrop-blur-xl dark:bg-white/10"
                       >
-                        ✍️ Signed 2 min ago
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-sage-100 dark:bg-white/10">
+                          <ShieldCheck size={15} className="text-sage-600 dark:text-sage-400" />
+                        </span>
+                        <span>
+                          <span className="block text-sm font-semibold leading-none text-ink dark:text-warm-50">Fully traced</span>
+                          <span className="mt-0.5 block text-[11px] text-warm-700 dark:text-warm-300">Every requirement linked</span>
+                        </span>
                       </motion.div>
+
                       <motion.div
                         animate={{ y: [0, 8, 0] }}
-                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 0.6 }}
-                        className="absolute -left-5 bottom-10 rounded-full border border-warm-200/70 bg-white px-4 py-2 text-xs font-semibold shadow-xl"
+                        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                        className="absolute -bottom-10 -left-8 flex items-center gap-3 rounded-2xl border border-warm-200/70 bg-white/90 px-5 py-4 shadow-xl backdrop-blur-xl dark:bg-white/10"
                       >
-                        🛡️ CR firewall on
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-100 dark:bg-amber-500/15">
+                          <Star size={18} className="fill-amber-500 text-amber-500" />
+                        </span>
+                        <span>
+                          <span className="block font-serif text-lg font-bold leading-none text-ink dark:text-warm-50">Signed</span>
+                          <span className="mt-0.5 block text-xs text-warm-700 dark:text-warm-300">Sarah K. · 2 min ago</span>
+                        </span>
                       </motion.div>
                     </div>
                   </BlurFade>
