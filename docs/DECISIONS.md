@@ -26,3 +26,53 @@ Consequence: worker/API/frontend move together; no backward compat with prototyp
 Context: `gemini-1.5-flash` is retired; spec requires verifying a stable Flash model.
 Decision: call ListModels (`x-goog-api-key` header) before implementing AI; record the chosen default in `docs/05-ai.md`. Tests always use `AI_PROVIDER=mock`.
 Consequence: no runtime surprises from retired models; AI code paths testable without a key.
+
+## D-06 — GEMINI_MODEL default is gemini-2.5-flash
+Context: `gemini-1.5-*` retired; model docs (Oct 2026) list `gemini-2.5-flash` as the stable Flash endpoint.
+Decision: default `GEMINI_MODEL=gemini-2.5-flash`, overridable via env. Key sent via `x-goog-api-key` header, never URL.
+Consequence: works with current keys; tests use `AI_PROVIDER=mock` regardless.
+
+## D-07 — Dedicated test database via globalSetup
+Context: backend tests need real Postgres+Redis without touching dev data.
+Decision: `TEST_DATABASE_URL` (`scopebridge_test`), created + `migrate deploy` in vitest `globalSetup`; per-worker env in `setupFiles`.
+Consequence: hermetic backend suite locally and in CI.
+
+## D-08 — Local Zod→JSON-Schema converter for OpenAPI
+Context: spec suggests `@asteasolutions/zod-to-openapi`, but minimizing new hard dependencies keeps `openapi:export` runnable everywhere.
+Decision: `backend/src/openapi/zodToJsonSchema.ts` converts our Zod subset; registry maps every route.
+Consequence: `npm run openapi:export` works with the installed tree; CI completeness check compares router stack vs registry.
+
+## D-09 — Mailer with nodemailer-first, raw-SMTP fallback
+Context: nodemailer may be absent from a given install; Mailpit speaks plain SMTP.
+Decision: `services/mailer.ts` dynamic-imports nodemailer; on failure uses a minimal built-in SMTP client (EHLO/AUTH-LOGIN/DATA, no TLS).
+Consequence: email works locally without extra deps; production uses nodemailer with TLS/auth after `npm install`.
+
+## D-10 — Custom Redis pub/sub event bus for realtime
+Context: worker must reach browsers but `@socket.io/redis-adapter/emitter` add deps and version coupling.
+Decision: worker publishes `{ room, event, payload }` on Redis channel `sb:events`; every API instance subscribes and forwards to Socket.IO rooms.
+Consequence: works single- and multi-instance with only ioredis; adapter packages remain optional.
+
+## D-11 — File text extraction with graceful degradation
+Context: `unpdf`/`mammoth` may be absent; DOCX is a zip (inflatable via node:zlib), PDFs often carry Flate streams.
+Decision: dynamic-import `unpdf`/`mammoth` when installed; else manual DOCX zip-parse and best-effort PDF stream decode; DOC/images → UNSUPPORTED.
+Consequence: extraction works without new deps for common files; Gemini still receives PDFs/images as inline parts.
+
+## D-12 — Distinct Redis prefixes per rate limiter
+Context: all limiters shared the default `rl:` key, so the AI limiter tripped on total traffic.
+Decision: `rl-api:`, `rl-auth:`, `rl-ai:` prefixes.
+Consequence: limits are independent and observable in Redis.
+
+## D-13 — amw() wrapper for every async middleware
+Context: Express 4 drops async middleware throws → unhandled rejection → hung requests (found via approve hang).
+Decision: `amw()` in core/http wraps requireProjectAccess/requireWorkspaceAccess/requireEntityAccess/requireClientAccess and custom one-off middlewares.
+Consequence: auth/access failures always return 403/404 envelopes, never hang.
+
+## D-14 — BullMQ custom jobIds avoid colons (except legacy 3-part form)
+Context: BullMQ rejects custom IDs containing `:` unless split(':').length === 3.
+Decision: dash-joined jobIds; enqueue failures mark the AiRun FAILED (no orphaned QUEUED runs).
+Consequence: deterministic ids, no silent queue failures.
+
+## D-15 — Mock AI derives requirement codes from the prompt
+Context: fixtures must reference real entities for processor tests and smoke runs.
+Decision: mock extracts `[A-Z]+-\d+` codes from input for readiness/acceptance fixtures; extraction stays a fixed valid fixture.
+Consequence: deterministic, code-linked fixtures exercising every path.
