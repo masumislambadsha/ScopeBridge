@@ -51,8 +51,8 @@ export default function PortalMessagesPage({ params }: { params: Promise<{ id: s
         {data && items.length === 0 && <EmptyState title="No messages yet" />}
         <ul className="grid gap-1">
           {items.map((m: any) => (
-            <li key={m.id} className="rounded-lg border bg-white p-2 text-sm">
-              <p className="text-xs text-zinc-500">{m.sender?.name} · {new Date(m.createdAt).toLocaleString()}</p>
+            <li key={m.id} className="rounded-2xl border bg-white p-2 text-sm">
+              <p className="text-xs text-warm-500">{m.sender?.name} · {new Date(m.createdAt).toLocaleString()}</p>
               <p className="whitespace-pre-wrap">{m.content}</p>
             </li>
           ))}

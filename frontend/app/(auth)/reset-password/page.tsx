@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api, ApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input, Label, FieldError } from "@/components/ui/input";
+import { AuthShell } from "@/components/auth-shell";
 
 const schema = z.object({ password: z.string().min(8, "At least 8 characters") });
 
@@ -30,25 +30,22 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Set a new password</CardTitle>
-          <CardDescription>Links expire after 1 hour and work once.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3">
-            <div>
-              <Label htmlFor="password">New password</Label>
-              <Input id="password" type="password" autoComplete="new-password" {...form.register("password")} />
-              <FieldError message={form.formState.errors.password?.message} />
-            </div>
-            {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-            <Button type="submit" disabled={form.formState.isSubmitting}>Reset password</Button>
-          </form>
-          <p className="mt-3 text-sm"><Link href="/login" className="underline">Back to login</Link></p>
-        </CardContent>
-      </Card>
-    </main>
+    <AuthShell
+      title="Set a new password"
+      description="Links expire after 1 hour and work once."
+      footer={
+        <Link href="/login" className="font-medium text-sage-600 underline underline-offset-4 hover:text-sage-700">Back to login</Link>
+      }
+    >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <div>
+          <Label htmlFor="password">New password</Label>
+          <Input id="password" type="password" autoComplete="new-password" {...form.register("password")} />
+          <FieldError message={form.formState.errors.password?.message} />
+        </div>
+        {serverError && <p className="text-sm font-medium text-red-600">{serverError}</p>}
+        <Button type="submit" size="pill" disabled={form.formState.isSubmitting}>Reset password</Button>
+      </form>
+    </AuthShell>
   );
 }

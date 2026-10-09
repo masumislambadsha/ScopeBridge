@@ -165,9 +165,9 @@ export function ScopeTab({ projectId }: { projectId: string }) {
                     {((versionQ.data.features ?? []) as Feature[]).map((f) => (
                       <li key={f.id} className="rounded border p-2 text-sm">
                         <p className="font-medium">{f.title} <StatusBadge status={f.priority} /></p>
-                        <p className="text-zinc-600">{f.description}</p>
+                        <p className="text-warm-600">{f.description}</p>
                         {(f.acceptanceCriteria ?? []).length > 0 && (
-                          <ul className="mt-1 list-disc pl-5 text-xs text-zinc-600">
+                          <ul className="mt-1 list-disc pl-5 text-xs text-warm-600">
                             {f.acceptanceCriteria.map((c, i) => <li key={i}>Given {c.given}, when {c.when}, then {c.then}</li>)}
                           </ul>
                         )}
@@ -180,10 +180,10 @@ export function ScopeTab({ projectId }: { projectId: string }) {
                   <div><p className="font-medium">Exclusions</p><ul className="list-disc pl-5">{((versionQ.data.exclusions ?? []) as string[]).map((d, i) => <li key={i}>{d}</li>)}</ul></div>
                 </div>
                 {versionQ.data.status === "DRAFT" && (
-                  <div className="sticky bottom-2 flex flex-wrap gap-2 rounded-lg border bg-white p-2 shadow">
+                  <div className="sticky bottom-2 flex flex-wrap gap-2 rounded-2xl border bg-white p-2 shadow">
                     <Button onClick={startEdit}>Edit draft</Button>
                     <Button variant="outline" onClick={() => genCriteria.mutate()} disabled={genCriteria.isPending}>Generate acceptance criteria (AI)</Button>
-                    <label className="flex items-center gap-1 text-xs text-zinc-600">
+                    <label className="flex items-center gap-1 text-xs text-warm-600">
                       <input type="checkbox" checked={replaceCriteria} onChange={(e) => setReplaceCriteria(e.target.checked)} /> replace reviewed
                     </label>
                     <Button variant="outline" onClick={() => setSendId(versionQ.data.id)}>Send for approval</Button>
@@ -210,7 +210,7 @@ export function ScopeTab({ projectId }: { projectId: string }) {
                   <p className="mb-1 text-sm font-medium">Build from requirements</p>
                   <div className="flex flex-wrap gap-1">
                     {(reqs.data ?? []).filter((r: any) => ["READY", "APPROVED"].includes(r.status)).map((r: any) => (
-                      <button key={r.id} className="rounded-full border px-2 py-1 text-xs hover:bg-zinc-50" onClick={() => addFeature(r.id, r.title)}>
+                      <button key={r.id} className="rounded-full border px-2 py-1 text-xs hover:bg-sage-50/40" onClick={() => addFeature(r.id, r.title)}>
                         + {r.code} {r.title.slice(0, 30)}
                       </button>
                     ))}
@@ -242,7 +242,7 @@ export function ScopeTab({ projectId }: { projectId: string }) {
             </Card>
           )}
           <ConfirmDialog open={!!sendId} onClose={() => setSendId(null)} onConfirm={() => sendId && send.mutate(sendId)} title="Send for client approval?" body="The version freezes as PENDING_APPROVAL and the client is notified." confirmLabel="Send" />
-          <p className="text-xs text-zinc-500">Approval history: <Link className="underline" href={`/projects/${projectId}/scope/compare`}>version compare page</Link></p>
+          <p className="text-xs text-warm-500">Approval history: <Link className="underline" href={`/projects/${projectId}/scope/compare`}>version compare page</Link></p>
         </>
       )}
     </div>

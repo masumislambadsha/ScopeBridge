@@ -30,7 +30,7 @@ export default function ProfilePage() {
         <Card>
           <CardHeader><CardTitle>{session?.user.name}</CardTitle></CardHeader>
           <CardContent className="grid gap-2">
-            <p className="text-sm text-zinc-600">{session?.user.email}</p>
+            <p className="text-sm text-warm-600">{session?.user.email}</p>
             <div>
               <Label htmlFor="name">Display name</Label>
               <Input id="name" defaultValue={session?.user.name} onChange={(e) => setName(e.target.value)} />

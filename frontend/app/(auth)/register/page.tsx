@@ -8,8 +8,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { ApiError, fieldErrors } from "@/lib/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input, Label, FieldError } from "@/components/ui/input";
+import { AuthShell } from "@/components/auth-shell";
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -38,39 +38,36 @@ export default function RegisterPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center p-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Create your account</CardTitle>
-          <CardDescription>Start managing scopes without the creep.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-3">
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" autoComplete="name" {...form.register("name")} />
-              <FieldError message={form.formState.errors.name?.message} />
-            </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
-              <FieldError message={form.formState.errors.email?.message} />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" autoComplete="new-password" {...form.register("password")} />
-              <FieldError message={form.formState.errors.password?.message} />
-            </div>
-            {serverError && <p className="text-sm text-red-600">{serverError}</p>}
-            <Button type="submit" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Creating…" : "Create account"}
-            </Button>
-          </form>
-          <p className="mt-3 text-sm">
-            Have an account? <Link href="/login" className="underline">Log in</Link>
-          </p>
-        </CardContent>
-      </Card>
-    </main>
+    <AuthShell
+      title="Create your account"
+      description="Start managing scopes without the creep."
+      footer={
+        <>
+          Have an account? <Link href="/login" className="font-medium text-sage-600 underline underline-offset-4 hover:text-sage-700">Log in</Link>
+        </>
+      }
+    >
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4">
+        <div>
+          <Label htmlFor="name">Name</Label>
+          <Input id="name" autoComplete="name" {...form.register("name")} />
+          <FieldError message={form.formState.errors.name?.message} />
+        </div>
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" autoComplete="email" {...form.register("email")} />
+          <FieldError message={form.formState.errors.email?.message} />
+        </div>
+        <div>
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" autoComplete="new-password" {...form.register("password")} />
+          <FieldError message={form.formState.errors.password?.message} />
+        </div>
+        {serverError && <p className="text-sm font-medium text-red-600">{serverError}</p>}
+        <Button type="submit" size="pill" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? "Creating…" : "Create account"}
+        </Button>
+      </form>
+    </AuthShell>
   );
 }

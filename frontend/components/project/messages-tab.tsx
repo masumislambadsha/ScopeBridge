@@ -50,7 +50,7 @@ export function MessagesTab({ projectId }: { projectId: string }) {
           <Textarea aria-label="Message" placeholder="Write a message…" value={text} onChange={(e) => { seq.current++; setText(e.target.value); }} />
           <div className="flex items-center gap-2">
             {canInternal && (
-              <select aria-label="Visibility" className="h-9 rounded-md border border-zinc-300 px-2 text-sm" value={visibility} onChange={(e) => setVisibility(e.target.value as "CLIENT" | "INTERNAL")}>
+              <select aria-label="Visibility" className="h-9 rounded-xl border border-warm-200 px-2 text-sm" value={visibility} onChange={(e) => setVisibility(e.target.value as "CLIENT" | "INTERNAL")}>
                 <option value="CLIENT">Client-visible</option>
                 <option value="INTERNAL">Internal (agency only)</option>
               </select>
@@ -64,8 +64,8 @@ export function MessagesTab({ projectId }: { projectId: string }) {
       {msgs.data && items.length === 0 && <EmptyState title="No messages yet" />}
       <ul className="grid gap-1">
         {items.map((m: any) => (
-          <li key={m.id} className={`max-w-[85%] rounded-lg border p-2 text-sm ${m.sender?.id === session?.user.id ? "ml-auto bg-zinc-900 text-white" : "bg-white"}`}>
-            <p className={`text-xs ${m.sender?.id === session?.user.id ? "text-zinc-300" : "text-zinc-500"}`}>
+          <li key={m.id} className={`max-w-[85%] rounded-2xl border p-2 text-sm ${m.sender?.id === session?.user.id ? "ml-auto bg-ink text-white" : "bg-white"}`}>
+            <p className={`text-xs ${m.sender?.id === session?.user.id ? "text-warm-300" : "text-warm-500"}`}>
               {m.sender?.name} · {new Date(m.createdAt).toLocaleString()}
               {m.visibility === "INTERNAL" && " · internal"}
             </p>

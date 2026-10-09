@@ -45,8 +45,8 @@ export default function NotificationsPage() {
               <CardContent className="flex flex-col gap-1 sm:flex-row sm:items-center">
                 <div className="flex-1">
                   <p className="font-medium">{n.title}</p>
-                  {n.body && <p className="text-sm text-zinc-600">{n.body}</p>}
-                  <p className="text-xs text-zinc-500">{format(new Date(n.createdAt), "MMM d, yyyy HH:mm")}</p>
+                  {n.body && <p className="text-sm text-warm-600">{n.body}</p>}
+                  <p className="text-xs text-warm-500">{format(new Date(n.createdAt), "MMM d, yyyy HH:mm")}</p>
                 </div>
                 {n.link && <a href={n.link} className="text-sm underline">Open</a>}
                 {!n.read && <Button size="sm" variant="outline" onClick={() => read.mutate(n.id)}>Mark read</Button>}

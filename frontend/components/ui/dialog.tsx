@@ -27,7 +27,7 @@ export function Dialog({
   if (!open) return null;
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/40 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
       role="presentation"
     >
@@ -35,10 +35,14 @@ export function Dialog({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={cn("max-h-[90vh] w-full overflow-y-auto rounded-t-xl bg-white p-4 sm:rounded-xl sm:p-6", wide ? "sm:max-w-3xl" : "sm:max-w-lg")}
+        className={cn(
+          "max-h-[90vh] w-full overflow-y-auto rounded-t-[2rem] border border-warm-200/70 bg-warm-50 p-6 shadow-soft sm:rounded-[2rem] sm:p-8 dark:bg-[#161310]",
+          wide ? "sm:max-w-3xl" : "sm:max-w-lg",
+          "animate-scale-in",
+        )}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-3 text-lg font-semibold">{title}</h2>
+        <h2 className="mb-4 font-serif text-2xl text-ink dark:text-warm-50">{title}</h2>
         {children}
       </div>
     </div>
@@ -64,13 +68,13 @@ export function ConfirmDialog({
 }) {
   return (
     <Dialog open={open} onClose={onClose} title={title}>
-      {body && <p className="mb-4 text-sm text-zinc-600">{body}</p>}
+      {body && <p className="mb-5 text-[15px] leading-relaxed text-warm-600">{body}</p>}
       <div className="flex justify-end gap-2">
         <Button variant="outline" onClick={onClose}>
           Cancel
         </Button>
         <Button
-          variant={danger ? "destructive" : "default"}
+          variant={danger ? "destructive" : "sage"}
           onClick={() => {
             onConfirm();
             onClose();
@@ -85,7 +89,7 @@ export function ConfirmDialog({
 
 export function Tabs({ tabs, active, onChange }: { tabs: Array<{ id: string; label: string }>; active: string; onChange: (id: string) => void }) {
   return (
-    <div className="flex gap-1 overflow-x-auto border-b border-zinc-200" role="tablist">
+    <div className="scrollbar-hide flex gap-1 overflow-x-auto rounded-full border border-warm-200/70 bg-white/70 p-1.5 backdrop-blur dark:bg-white/5" role="tablist">
       {tabs.map((t) => (
         <button
           key={t.id}
@@ -93,8 +97,8 @@ export function Tabs({ tabs, active, onChange }: { tabs: Array<{ id: string; lab
           aria-selected={t.id === active}
           onClick={() => onChange(t.id)}
           className={cn(
-            "whitespace-nowrap px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400",
-            t.id === active ? "border-b-2 border-zinc-900 text-zinc-900" : "text-zinc-500 hover:text-zinc-800",
+            "whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sage-400",
+            t.id === active ? "bg-sage-600 text-white shadow-lg shadow-sage-600/25" : "text-warm-600 hover:bg-sage-50 hover:text-sage-700",
           )}
         >
           {t.label}
